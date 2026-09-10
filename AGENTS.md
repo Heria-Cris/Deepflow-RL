@@ -151,6 +151,12 @@ Windows 的 GBK 终端下，现有中文和 emoji 控制台输出需要设置 `P
 权重、检查点、归一化产物或其他训练二进制文件。完成代码发布后，须确认远程分支不
 包含 `models/`，并使用清晰中文提交描述。
 
+当前约定如下：本目录中的 `main` 是完整本地分支，绝不能直接推送；代码发布分支为
+`publish`，其链接工作树位于 `E:\workspace\python\DeepFlow-RL-publish`，并跟踪
+远程 `origin/main`。完成本地 `main` 提交后，将不含 `models/` 的有效发布文件同步
+至该工作树，在 `publish` 分支提交并执行 `git push origin publish:main`。每次发布前
+运行 `git diff --name-only -- models` 或 `git ls-tree -r HEAD -- models`，其输出必须为空。
+
 模型的 `.zip`、`.pkl` 和 `.npz` 文件可继续由 Git LFS 为本地完整版本管理，但不得
 使用 `git push --no-verify` 规避 LFS 上传：该做法会在远程留下失效的 LFS 指针，既
 不是完整模型发布，也不是干净的代码发布。不得提交密码、访问令牌、私钥、环境变量

@@ -47,3 +47,7 @@ python analyze_memory_feasibility.py
 提交。训练模型、检查点和归一化文件只保留在本地完整版本中；远程发布仅推送不含
 `models/` 的代码发布分支或副本。请勿提交访问令牌、密钥、环境变量文件、Python
 缓存或 IDE 本地配置。
+
+本地完整版本使用根目录的 `main` 分支；远程 GitHub `main` 由 `publish` 分支发布，
+发布工作树位于 `E:\workspace\python\DeepFlow-RL-publish`。不要直接推送本地完整
+`main` 分支。
