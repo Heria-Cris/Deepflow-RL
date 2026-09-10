@@ -1,0 +1,45 @@
+{
+  "devices": [
+    {
+      "device_id": 0,
+      "name": "NVIDIA Jetson AGX Orin (64GB)",
+      "device_type": "edge",
+      "fp16_tflops": 65.0,
+      "mem_bandwidth_gb_s": 160.0,
+      "max_memory_gb": 64.0,
+      "runtime_reserved_memory_gb": 18.0,
+      "compute_efficiency": 0.38,
+      "memory_efficiency": 0.72,
+      "pcie_latency_us": 20.0
+    },
+    {
+      "device_id": 1,
+      "name": "NVIDIA A100-PCIE-80GB",
+      "device_type": "cloud",
+      "fp16_tflops": 312.0,
+      "mem_bandwidth_gb_s": 1555.0,
+      "max_memory_gb": 80.0,
+      "runtime_reserved_memory_gb": 10.0,
+      "compute_efficiency": 0.52,
+      "memory_efficiency": 0.85,
+      "pcie_latency_us": 10.0
+    }
+  ],
+  "network": {
+    "bandwidth_mbps": 1.0,
+    "latency_ms": 50.0,
+    "bandwidth_efficiency": 0.82,
+    "serialization_overhead_ms": 0.5
+  },
+  "simulator": {
+    "memory_budget_ratio": 0.78,
+    "weight_reservation_factor": 1.08,
+    "activation_safety_factor": 2.40,
+    "kv_cache_safety_factor": 1.35,
+    "framework_overhead_edge_mb": 2500.0,
+    "framework_overhead_cloud_mb": 6000.0,
+    "comm_buffer_safety_factor": 2.00,
+    "verify_workspace_factor": 2.20,
+    "max_analysis_prompt_len": 8192
+  }
+}

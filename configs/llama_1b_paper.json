@@ -1,0 +1,10 @@
+{
+    "model_name": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+    "num_layers": 20,
+    "hidden_size": 2048,
+    "intermediate_size": 5632,
+    "num_heads": 32,
+    "vocab_size": 32000,
+    "max_position_embeddings": 2048,
+    "bytes_per_param": 2
+}
