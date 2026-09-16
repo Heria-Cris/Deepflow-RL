@@ -1,5 +1,6 @@
 # eval_phase5.py
 import os
+from pickle import UnpicklingError
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor, VecNormalize
 
@@ -39,11 +40,25 @@ def evaluate():
         stats_path = final_stats_path
 
     base_env = build_base_env()
-    env = VecNormalize.load(stats_path, base_env)
+    try:
+        env = VecNormalize.load(stats_path, base_env)
+    except (UnpicklingError, ValueError) as exc:
+        raise RuntimeError(
+            "The saved VecNormalize artifact cannot be used with the current environment. Ensure "
+            "Git LFS has restored the binary file, then retrain PPO with train_phase5.py because "
+            "the observation is now [bandwidth_mbps, link_delay_ms, prompt_len]. Evaluate only "
+            "the paired model and VecNormalize artifact."
+        ) from exc
     env.training = False
     env.norm_reward = False
 
-    model = PPO.load(model_path, env=env)
+    try:
+        model = PPO.load(model_path, env=env)
+    except ValueError as exc:
+        raise RuntimeError(
+            "The saved PPO model is incompatible with the current observation space. Retrain it "
+            "with train_phase5.py and keep it paired with the matching VecNormalize artifact."
+        ) from exc
 
     print(f"✅ Model loaded: {model_path}")
     print(f"✅ VecNormalize loaded: {stats_path}")
@@ -56,12 +71,12 @@ def evaluate():
         ("Weak / Short Prompt", 1.0, 50.0, 512),
         ("Moderate / Short Prompt", 5.0, 30.0, 512),
         ("Strong / Short Prompt", 100.0, 10.0, 512),
-        ("Weak / Long Prompt", 1.0, 50.0, 2048),
-        ("Strong / Long Prompt", 100.0, 10.0, 2048),
-        ("Weak / Very Long Prompt", 1.0, 50.0, 4096),
-        ("Strong / Very Long Prompt", 100.0, 10.0, 4096),
+        ("Weak / Medium Prompt", 1.0, 50.0, 1024),
+        ("Strong / Medium Prompt", 100.0, 10.0, 1024),
+        ("Weak / Long Prompt", 1.0, 50.0, 1536),
+        ("Strong / Long Prompt", 100.0, 10.0, 1536),
         ("High RTT / Short Prompt", 10.0, 120.0, 512),
-        ("High RTT / Very Long Prompt", 10.0, 120.0, 4096),
+        ("High RTT / Long Prompt", 10.0, 120.0, 1536),
     ]
 
     for name, bw, lat, prompt_len in scenarios:
@@ -107,10 +122,7 @@ def evaluate():
         print(f"    - Cloud Peak/Budget : {info['cloud_peak_memory_mb']:.2f} / {info['cloud_budget_mb']:.2f} MB ({cloud_ratio:.3f})")
         print(f"    - OOM Device        : {info['oom_device']}")
 
-        if part == 0:
-            print("  ✅ Strategy: DeepFlow mode (Token-ID transfer)")
-        else:
-            print("  ⚠️ Strategy: Legacy split / activation transfer")
+        print(f"  Strategy: {info['mode']}")
 
 
 if __name__ == "__main__":

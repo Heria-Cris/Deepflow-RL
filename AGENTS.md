@@ -194,8 +194,8 @@ Windows 的 GBK 终端下，现有中文和 emoji 控制台输出需要设置 `P
 - 草稿模型与目标模型的解析配置 `max_position_embeddings` 分别为 2048 和 4096，
   但仿真器并不强制限制，且分析 Prompt 可达 8192。若该点受到审稿人关注，应一并
   说明或修订抽象、实验和结论，不能只修改文字。
-- `P=0, K=0` 在代码中作为 cloud-only 基线。当前仿真器仍通过 `max(1, K)` 施加
-  最小单 Token 传输载荷；未核对和修改该约定前，不得把它称为严格的零通信云端
-  执行。
+- `P=0, K=0` 是 `Remote Target without Speculation`：仍通过 `max(1, K)` 保留最小
+  Token 请求载荷，因而不得把它称为严格的零通信云端执行。`P=num_layers, K=0` 才是
+  `Strict Local Target`，其通信和云端阶段均为零。
 - 经过塑形的奖励函数（shaped reward）对 `P=0` 有很小奖励、对非零分区有很小惩罚。不得宣称 PPO 完全
   没有策略偏好；准确表述应为加入了轻量的结构先验。

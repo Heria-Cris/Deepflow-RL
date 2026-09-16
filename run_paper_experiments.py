@@ -1,5 +1,6 @@
 # run_paper_experiments.py
 import os
+from pickle import UnpicklingError
 from typing import Dict, List, Tuple, Optional
 
 import numpy as np
@@ -42,11 +43,25 @@ def load_best_agent():
         stats_path = final_stats_path
 
     base_env = build_base_env()
-    env = VecNormalize.load(stats_path, base_env)
+    try:
+        env = VecNormalize.load(stats_path, base_env)
+    except (UnpicklingError, ValueError) as exc:
+        raise RuntimeError(
+            "The saved VecNormalize artifact cannot be used with the current environment. Ensure "
+            "Git LFS has restored the binary file, then retrain PPO with train_phase5.py because "
+            "the observation is now [bandwidth_mbps, link_delay_ms, prompt_len]. Use the paired "
+            "model and VecNormalize artifact."
+        ) from exc
     env.training = False
     env.norm_reward = False
 
-    model = PPO.load(model_path, env=env)
+    try:
+        model = PPO.load(model_path, env=env)
+    except ValueError as exc:
+        raise RuntimeError(
+            "The saved PPO model is incompatible with the current observation space. Retrain it "
+            "with train_phase5.py and keep it paired with the matching VecNormalize artifact."
+        ) from exc
     return model, env
 
 
@@ -107,9 +122,9 @@ def _print_method_row(method: str, strategy: str, throughput: float, speedup_bas
 # Feasible baseline search
 # ============================================================
 
-def _search_best_feasible_local_only(raw_env: DeepFlowEnv) -> Tuple[Optional[List[int]], Optional[Dict]]:
+def _search_best_feasible_strict_local_target(raw_env: DeepFlowEnv) -> Tuple[Optional[List[int]], Optional[Dict]]:
     """
-    Local only:
+    Strict Local Target:
       - partition = all target layers on edge => P=num_layers
       - k = 0
       - search MB
@@ -129,9 +144,9 @@ def _search_best_feasible_local_only(raw_env: DeepFlowEnv) -> Tuple[Optional[Lis
     return best_action, best_info
 
 
-def _search_best_feasible_cloud_only(raw_env: DeepFlowEnv) -> Tuple[Optional[List[int]], Optional[Dict]]:
+def _search_best_feasible_remote_target_without_speculation(raw_env: DeepFlowEnv) -> Tuple[Optional[List[int]], Optional[Dict]]:
     """
-    Cloud only:
+    Remote Target without Speculation:
       - partition = 0
       - k = 0
       - search MB
@@ -208,8 +223,8 @@ def experiment_1_best_ppo_vs_feasible_baselines(model: PPO, vec_env: VecNormaliz
 
     _set_scenario(raw_env, bw=1.0, lat=50.0, prompt_len=512)
 
-    local_action, local_info = _search_best_feasible_local_only(raw_env)
-    cloud_action, cloud_info = _search_best_feasible_cloud_only(raw_env)
+    local_action, local_info = _search_best_feasible_strict_local_target(raw_env)
+    remote_action, remote_info = _search_best_feasible_remote_target_without_speculation(raw_env)
     split_action, split_info = _search_best_feasible_legacy_split(raw_env)
     static_action, static_info = _search_best_static_deepflow(raw_env)
     ppo_action, ppo_info = _eval_best_action(model, vec_env, raw_env)
@@ -218,12 +233,12 @@ def experiment_1_best_ppo_vs_feasible_baselines(model: PPO, vec_env: VecNormaliz
     baseline_t = local_info["throughput"] if local_info is not None else 0.0
 
     if local_action is not None:
-        _print_method_row("Best Feasible Local Only", _action_str(raw_env, local_action), local_info["throughput"], baseline_t)
+        _print_method_row("Best Feasible Strict Local Target", _action_str(raw_env, local_action), local_info["throughput"], baseline_t)
     else:
-        _print_method_row("Best Feasible Local Only", "N/A", 0.0, baseline_t)
+        _print_method_row("Best Feasible Strict Local Target", "N/A", 0.0, baseline_t)
 
-    if cloud_action is not None:
-        _print_method_row("Best Feasible Cloud Only", _action_str(raw_env, cloud_action), cloud_info["throughput"], baseline_t)
+    if remote_action is not None:
+        _print_method_row("Best Feasible Remote Target without Speculation", _action_str(raw_env, remote_action), remote_info["throughput"], baseline_t)
 
     if split_action is not None:
         _print_method_row("Best Feasible Legacy Split", _action_str(raw_env, split_action), split_info["throughput"], baseline_t)
@@ -236,8 +251,8 @@ def experiment_1_best_ppo_vs_feasible_baselines(model: PPO, vec_env: VecNormaliz
     return {
         "local_action": local_action,
         "local_info": local_info,
-        "cloud_action": cloud_action,
-        "cloud_info": cloud_info,
+        "remote_action": remote_action,
+        "remote_info": remote_info,
         "split_action": split_action,
         "split_info": split_info,
         "static_action": static_action,
@@ -256,8 +271,8 @@ def experiment_2_best_ppo_vs_best_static_deepflow(model: PPO, vec_env: VecNormal
         ("Weak Net / Short Prompt", 1.0, 50.0, 512),
         ("Moderate Net / Short Prompt", 5.0, 30.0, 512),
         ("Strong Net / Short Prompt", 100.0, 10.0, 512),
-        ("Weak Net / Long Prompt", 1.0, 50.0, 2048),
-        ("Strong Net / Long Prompt", 100.0, 10.0, 2048),
+        ("Weak Net / Long Prompt", 1.0, 50.0, 1536),
+        ("Strong Net / Long Prompt", 100.0, 10.0, 1536),
     ]
 
     for name, bw, lat, prompt_len in scenarios:
@@ -312,10 +327,10 @@ def experiment_4_action_sensitivity_table(model: PPO, vec_env: VecNormalize, raw
     scenarios = [
         ("Weak / 128", 1.0, 50.0, 128),
         ("Weak / 512", 1.0, 50.0, 512),
-        ("Weak / 2048", 1.0, 50.0, 2048),
+        ("Weak / 1024", 1.0, 50.0, 1024),
         ("Moderate / 512", 5.0, 30.0, 512),
         ("Strong / 512", 100.0, 10.0, 512),
-        ("Strong / 2048", 100.0, 10.0, 2048),
+        ("Strong / 1536", 100.0, 10.0, 1536),
         ("Very Weak / 512", 0.5, 80.0, 512),
         ("High RTT / 512", 10.0, 120.0, 512),
     ]
@@ -356,7 +371,7 @@ def experiment_5_action_distribution_grid(model: PPO, vec_env: VecNormalize, raw
 
     bandwidths = [0.5, 1.0, 10.0, 100.0]
     latencies = [10.0, 50.0, 100.0]
-    prompts = [128, 512, 2048]
+    prompts = [128, 512, 1024, 1536]
 
     for bw in bandwidths:
         for lat in latencies:
@@ -384,10 +399,10 @@ def experiment_6_compare_ppo_to_feasible_oracle(model: PPO, vec_env: VecNormaliz
     scenarios = [
         ("Weak / 128", 1.0, 50.0, 128),
         ("Weak / 512", 1.0, 50.0, 512),
-        ("Weak / 2048", 1.0, 50.0, 2048),
-        ("Weak / 4096", 1.0, 50.0, 4096),
+        ("Weak / 1024", 1.0, 50.0, 1024),
+        ("Weak / 1536", 1.0, 50.0, 1536),
         ("Strong / 512", 100.0, 10.0, 512),
-        ("Strong / 2048", 100.0, 10.0, 2048),
+        ("Strong / 1536", 100.0, 10.0, 1536),
     ]
 
     for name, bw, lat, prompt_len in scenarios:

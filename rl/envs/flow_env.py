@@ -47,15 +47,14 @@ class DeepFlowEnv(gym.Env):
         ])
 
         self.observation_space = spaces.Box(
-            low=np.array([0.1, 1.0, 1.0, 0.0], dtype=np.float32),
-            high=np.array([1000.0, 1000.0, float(self.max_analysis_prompt_len), 10000.0], dtype=np.float32),
+            low=np.array([0.1, 1.0, 1.0], dtype=np.float32),
+            high=np.array([1000.0, 1000.0, float(self.max_analysis_prompt_len)], dtype=np.float32),
             dtype=np.float32,
         )
 
         self.current_bandwidth = float(self.network.bandwidth_mbps)
         self.current_latency = float(self.network.latency_s * 1000.0)
         self.current_prompt_len = 512
-        self.last_throughput = 0.0
         self.step_count = 0
 
     def _load_physical_world(self):
@@ -119,7 +118,7 @@ class DeepFlowEnv(gym.Env):
     def _sample_random_scenario(self):
         bw = float(np.exp(self.rng.uniform(np.log(0.5), np.log(100.0))))
         lat = float(self.rng.uniform(5.0, 120.0))
-        prompt_candidates = [128, 256, 512, 768, 1024, 1536, 2048, 3072, 4096, 6144, 8192]
+        prompt_candidates = [128, 512, 1024, 1536]
         prompt_len = int(self.rng.choice(prompt_candidates))
         self.set_scenario(bw, lat, prompt_len)
 
@@ -128,7 +127,6 @@ class DeepFlowEnv(gym.Env):
             self.current_bandwidth,
             self.current_latency,
             self.current_prompt_len,
-            self.last_throughput,
         ], dtype=np.float32)
 
     def reset(self, seed=None, options: Optional[Dict[str, Any]] = None):
@@ -138,7 +136,6 @@ class DeepFlowEnv(gym.Env):
             self.rng = np.random.default_rng(seed)
 
         self.step_count = 0
-        self.last_throughput = 0.0
         options = options or {}
 
         if "bandwidth_mbps" in options and "latency_ms" in options and "prompt_len" in options:
@@ -196,6 +193,7 @@ class DeepFlowEnv(gym.Env):
 
         micro_batch_size = self.mb_options[mb_idx]
         k_steps = self.k_options[k_idx]
+        mode = self.simulator.describe_execution_mode(k_steps, partition_point)
 
         if self.total_batch_size % micro_batch_size != 0:
             return {
@@ -213,6 +211,8 @@ class DeepFlowEnv(gym.Env):
                 "edge_budget_mb": self.edge.available_memory_gb * 1024.0 * self.memory_budget_ratio,
                 "cloud_budget_mb": self.cloud.available_memory_gb * 1024.0 * self.memory_budget_ratio,
                 "oom_device": "invalid_micro_batch",
+                "infeasibility_reason": "invalid_micro_batch",
+                "mode": mode,
                 "memory_breakdown": {},
                 "util_edge": 0.0,
                 "util_cloud": 0.0,
@@ -250,6 +250,8 @@ class DeepFlowEnv(gym.Env):
             "edge_budget_mb": result.edge_budget_mb,
             "cloud_budget_mb": result.cloud_budget_mb,
             "oom_device": result.oom_device,
+            "infeasibility_reason": result.infeasibility_reason,
+            "mode": mode,
             "memory_breakdown": result.memory_breakdown,
         }
 
@@ -298,9 +300,6 @@ class DeepFlowEnv(gym.Env):
     # ------------------------------------------------------------------
     def step(self, action):
         info = self.evaluate_action(action)
-
-        throughput = float(info["throughput"]) if (info["valid"] and info["feasible"]) else 0.0
-        self.last_throughput = throughput
 
         reward = self._compute_reward(info)
 

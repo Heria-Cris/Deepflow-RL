@@ -60,6 +60,7 @@ class SimulationResult:
     edge_budget_mb: float
     cloud_budget_mb: float
     oom_device: str
+    infeasibility_reason: str
     memory_breakdown: Dict[str, float]
 
 
@@ -168,6 +169,116 @@ class DeepFlowSimulator:
             return 0.0
         return sum(layer.get_kv_cache_increment_mb(batch_size) for layer in layers)
 
+    def describe_execution_mode(self, k_steps: int, partition_point: int) -> str:
+        """Return the externally visible protocol label for one joint action."""
+        num_layers = len(self.target_model.layers)
+        if partition_point == num_layers:
+            if k_steps == 0:
+                return "Strict Local Target"
+            return "Local Target with Speculation"
+        if partition_point == 0:
+            if k_steps == 0:
+                return "Remote Target without Speculation"
+            return "Token Speculative DeepFlow"
+        if k_steps == 0:
+            return "Legacy Activation Split"
+        return "Activation Split with Speculation"
+
+    def _communication_payload_mb(
+        self,
+        micro_batch_size: int,
+        k_steps: int,
+        partition_point: int,
+    ) -> float:
+        """Return the payload only when a target-model suffix runs in the cloud."""
+        num_layers = len(self.target_model.layers)
+        if partition_point == num_layers:
+            return 0.0
+        if partition_point == 0:
+            # A remote request still carries a minimum Token-ID request when K=0.
+            return self.target_model.get_token_id_size_mb(
+                batch_size=micro_batch_size,
+                seq_len=max(1, k_steps),
+            )
+
+        last_edge_layer = self.target_model.layers[partition_point - 1]
+        return last_edge_layer.get_activation_memory_mb(
+            batch_size=micro_batch_size,
+            seq_len=k_steps + 1,
+        )
+
+    def _position_limit_reason(
+        self,
+        k_steps: int,
+        partition_point: int,
+        prompt_len: int,
+    ) -> str:
+        """Check only models that participate in the action's execution path."""
+        del partition_point  # The target participates for every supported partition.
+
+        violations: List[str] = []
+        if k_steps > 0:
+            draft_required_len = prompt_len + k_steps
+            draft_cap = int(self.draft_model.config["max_position_embeddings"])
+            if draft_required_len > draft_cap:
+                violations.append("draft_position_limit")
+
+        target_required_len = max(1, prompt_len + k_steps + 1)
+        target_cap = int(self.target_model.config["max_position_embeddings"])
+        if target_required_len > target_cap:
+            violations.append("target_position_limit")
+
+        if not violations:
+            return "none"
+        return "_and_".join(violations)
+
+    def _edge_task_type(self, k_steps: int, partition_point: int) -> str:
+        num_layers = len(self.target_model.layers)
+        components: List[str] = []
+        if k_steps > 0:
+            components.append("Draft")
+        if partition_point == num_layers:
+            components.append("Local Target")
+        elif partition_point > 0:
+            components.append("Target Prefix")
+        return " + ".join(components)
+
+    def _cloud_task_type(self, k_steps: int, partition_point: int) -> str:
+        if partition_point == 0 and k_steps == 0:
+            return "Remote Target"
+        if k_steps == 0:
+            return "Target Suffix"
+        return "Verify"
+
+    @staticmethod
+    def _infeasible_result(
+        cost: StageCost,
+        mem: MemoryEstimate,
+        reason: str,
+    ) -> SimulationResult:
+        return SimulationResult(
+            feasible=False,
+            makespan=1e9,
+            throughput=0.0,
+            timeline=[],
+            util_edge=0.0,
+            util_cloud=0.0,
+            bubble_rate=1.0,
+            bottleneck_stage=-1,
+            data_size_mb=cost.data_size_mb,
+            effective_tokens_per_seq=cost.effective_tokens_per_seq,
+            total_effective_tokens=0.0,
+            stage_costs={"edge": cost.edge_time, "comm": cost.comm_time, "cloud": cost.cloud_time},
+            verify_seq_len=cost.verify_seq_len,
+            edge_peak_memory_mb=mem.edge_peak_memory_mb,
+            cloud_peak_memory_mb=mem.cloud_peak_memory_mb,
+            edge_budget_mb=mem.edge_budget_mb,
+            cloud_budget_mb=mem.cloud_budget_mb,
+            oom_device=mem.oom_device,
+            infeasibility_reason=reason,
+            memory_breakdown=mem.breakdown,
+        )
+
     # ------------------------------------------------------------------
     # Stage cost
     # ------------------------------------------------------------------
@@ -207,18 +318,11 @@ class DeepFlowSimulator:
 
         edge_time = edge_draft_time + edge_target_prefix_time
 
-        if partition_point == 0:
-            transfer_tokens = max(1, k_steps)
-            data_size_mb = self.target_model.get_token_id_size_mb(
-                batch_size=micro_batch_size,
-                seq_len=transfer_tokens,
-            )
-        else:
-            last_edge_layer = self.target_model.layers[partition_point - 1]
-            data_size_mb = last_edge_layer.get_activation_memory_mb(
-                batch_size=micro_batch_size,
-                seq_len=k_steps + 1,
-            )
+        data_size_mb = self._communication_payload_mb(
+            micro_batch_size=micro_batch_size,
+            k_steps=k_steps,
+            partition_point=partition_point,
+        )
 
         comm_time = PhysicsEngine.estimate_transmission_latency(self.network, data_size_mb)
 
@@ -261,30 +365,34 @@ class DeepFlowSimulator:
         prefix_layers = target_layers[:partition_point]
         suffix_layers = target_layers[partition_point:]
 
-        # Communication buffer
-        if partition_point == 0:
-            transfer_tokens = max(1, k_steps)
-            data_size_mb = self.target_model.get_token_id_size_mb(
-                batch_size=micro_batch_size,
-                seq_len=transfer_tokens,
-            )
-        else:
-            last_edge_layer = target_layers[partition_point - 1]
-            data_size_mb = last_edge_layer.get_activation_memory_mb(
-                batch_size=micro_batch_size,
-                seq_len=k_steps + 1,
-            )
+        uses_draft = k_steps > 0
+        uses_edge_target = partition_point > 0
+        uses_cloud_target = partition_point < len(target_layers)
+
+        # Communication buffers exist only when a cloud-side target suffix receives data.
+        data_size_mb = self._communication_payload_mb(
+            micro_batch_size=micro_batch_size,
+            k_steps=k_steps,
+            partition_point=partition_point,
+        )
 
         comm_buffer_mb = data_size_mb * self.comm_buffer_safety_factor
 
         # ---------------- Edge ----------------
-        edge_draft_weights_mb = self._model_weight_mb(self.draft_model) * self.weight_reservation_factor
+        edge_framework_overhead_mb = self.framework_overhead_edge_mb if (uses_draft or uses_edge_target) else 0.0
+        edge_draft_weights_mb = (
+            self._model_weight_mb(self.draft_model) * self.weight_reservation_factor
+            if uses_draft else 0.0
+        )
         edge_prefix_weights_mb = self._model_weight_mb(
             self.target_model, 0, partition_point
         ) * self.weight_reservation_factor
 
         # Draft KV: speculative draft model cache
-        edge_draft_kv_per_token_mb = self._sum_kv_cache_increment_mb(draft_layers, micro_batch_size)
+        edge_draft_kv_per_token_mb = (
+            self._sum_kv_cache_increment_mb(draft_layers, micro_batch_size)
+            if uses_draft else 0.0
+        )
         edge_draft_kv_total_mb = (
             edge_draft_kv_per_token_mb
             * max(1, prompt_len + k_steps)
@@ -299,7 +407,7 @@ class DeepFlowSimulator:
             * self.kv_cache_safety_factor
         )
 
-        edge_draft_act_mb = self._max_activation_mb(draft_layers, micro_batch_size, 1)
+        edge_draft_act_mb = self._max_activation_mb(draft_layers, micro_batch_size, 1) if uses_draft else 0.0
         edge_prefix_act_mb = self._sum_activation_mb(prefix_layers, micro_batch_size, verify_seq_len)
 
         edge_scratch_mb = self.activation_safety_factor * max(
@@ -309,7 +417,7 @@ class DeepFlowSimulator:
         )
 
         edge_peak_memory_mb = (
-            self.framework_overhead_edge_mb
+            edge_framework_overhead_mb
             + edge_draft_weights_mb
             + edge_prefix_weights_mb
             + edge_draft_kv_total_mb
@@ -318,6 +426,7 @@ class DeepFlowSimulator:
         )
 
         # ---------------- Cloud ----------------
+        cloud_framework_overhead_mb = self.framework_overhead_cloud_mb if uses_cloud_target else 0.0
         cloud_suffix_weights_mb = self._model_weight_mb(
             self.target_model, partition_point, len(target_layers)
         ) * self.weight_reservation_factor
@@ -341,7 +450,7 @@ class DeepFlowSimulator:
         )
 
         cloud_peak_memory_mb = (
-            self.framework_overhead_cloud_mb
+            cloud_framework_overhead_mb
             + cloud_suffix_weights_mb
             + cloud_suffix_kv_total_mb
             + cloud_workspace_mb
@@ -363,13 +472,13 @@ class DeepFlowSimulator:
             oom_device = "cloud"
 
         breakdown = {
-            "edge_framework_overhead_mb": self.framework_overhead_edge_mb,
+            "edge_framework_overhead_mb": edge_framework_overhead_mb,
             "edge_draft_weights_mb": edge_draft_weights_mb,
             "edge_prefix_weights_mb": edge_prefix_weights_mb,
             "edge_draft_kv_total_mb": edge_draft_kv_total_mb,
             "edge_prefix_kv_total_mb": edge_prefix_kv_total_mb,
             "edge_scratch_mb": edge_scratch_mb,
-            "cloud_framework_overhead_mb": self.framework_overhead_cloud_mb,
+            "cloud_framework_overhead_mb": cloud_framework_overhead_mb,
             "cloud_suffix_weights_mb": cloud_suffix_weights_mb,
             "cloud_suffix_kv_total_mb": cloud_suffix_kv_total_mb,
             "cloud_workspace_mb": cloud_workspace_mb,
@@ -408,6 +517,8 @@ class DeepFlowSimulator:
             )
         if not (0 <= partition_point <= len(self.target_model.layers)):
             raise ValueError("partition_point out of range")
+        if prompt_len <= 0:
+            raise ValueError("prompt_len must be positive")
 
         mem = self.estimate_peak_memory(
             micro_batch_size=micro_batch_size,
@@ -424,28 +535,16 @@ class DeepFlowSimulator:
             acceptance_fn=acceptance_fn,
         )
 
+        position_reason = self._position_limit_reason(
+            k_steps=k_steps,
+            partition_point=partition_point,
+            prompt_len=prompt_len,
+        )
+        if position_reason != "none":
+            return self._infeasible_result(cost, mem, position_reason)
+
         if not mem.feasible:
-            return SimulationResult(
-                feasible=False,
-                makespan=1e9,
-                throughput=0.0,
-                timeline=[],
-                util_edge=0.0,
-                util_cloud=0.0,
-                bubble_rate=1.0,
-                bottleneck_stage=-1,
-                data_size_mb=cost.data_size_mb,
-                effective_tokens_per_seq=cost.effective_tokens_per_seq,
-                total_effective_tokens=0.0,
-                stage_costs={"edge": cost.edge_time, "comm": cost.comm_time, "cloud": cost.cloud_time},
-                verify_seq_len=cost.verify_seq_len,
-                edge_peak_memory_mb=mem.edge_peak_memory_mb,
-                cloud_peak_memory_mb=mem.cloud_peak_memory_mb,
-                edge_budget_mb=mem.edge_budget_mb,
-                cloud_budget_mb=mem.cloud_budget_mb,
-                oom_device=mem.oom_device,
-                memory_breakdown=mem.breakdown,
-            )
+            return self._infeasible_result(cost, mem, f"memory_{mem.oom_device}_oom")
 
         num_micro_batches = total_batch_size // micro_batch_size
         timeline: List[TaskEvent] = []
@@ -462,7 +561,7 @@ class DeepFlowSimulator:
             end_edge = start_edge + cost.edge_time
             if cost.edge_time > 0:
                 timeline.append(TaskEvent(
-                    task_type="Draft",
+                    task_type=self._edge_task_type(k_steps, partition_point),
                     mb_id=mb_id,
                     device_name=self.edge.name,
                     start_time=start_edge,
@@ -474,21 +573,22 @@ class DeepFlowSimulator:
 
             start_comm = max(end_edge, t_net_free)
             end_comm = start_comm + cost.comm_time
-            timeline.append(TaskEvent(
-                task_type="Comm",
-                mb_id=mb_id,
-                device_name="Network",
-                start_time=start_comm,
-                end_time=end_comm,
-                duration=cost.comm_time,
-            ))
+            if cost.comm_time > 0:
+                timeline.append(TaskEvent(
+                    task_type="Comm",
+                    mb_id=mb_id,
+                    device_name="Network",
+                    start_time=start_comm,
+                    end_time=end_comm,
+                    duration=cost.comm_time,
+                ))
             t_net_free = end_comm
 
             start_cloud = max(end_comm, t_cloud_free)
             end_cloud = start_cloud + cost.cloud_time
             if cost.cloud_time > 0:
                 timeline.append(TaskEvent(
-                    task_type="Verify",
+                    task_type=self._cloud_task_type(k_steps, partition_point),
                     mb_id=mb_id,
                     device_name=self.cloud.name,
                     start_time=start_cloud,
@@ -534,5 +634,6 @@ class DeepFlowSimulator:
             edge_budget_mb=mem.edge_budget_mb,
             cloud_budget_mb=mem.cloud_budget_mb,
             oom_device=mem.oom_device,
+            infeasibility_reason="none",
             memory_breakdown=mem.breakdown,
         )
