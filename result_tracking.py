@@ -205,6 +205,10 @@ class ResultRecorder:
         artifact = self.metadata.get(key)
         return "" if artifact is None else str(artifact["path"])
 
+    def update_metadata(self, **values: Any) -> None:
+        """Add policy-calibration facts before the suite is written."""
+        self.metadata.update(values)
+
     def write(self) -> Tuple[Path, Path]:
         self.output_dir.mkdir(parents=True, exist_ok=True)
         suite = str(self.metadata["suite"])

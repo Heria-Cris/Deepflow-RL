@@ -7,6 +7,14 @@ import numpy as np
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor, VecNormalize
 
+from policy_baselines import (
+    INDEPENDENT_TEST_SCENARIOS,
+    GlobalStaticSelection,
+    heuristic_deepflow_action,
+    search_per_scenario_oracle,
+    select_global_static_deepflow,
+    token_speculation_without_pipeline_action,
+)
 from result_tracking import ResultRecorder, build_run_metadata
 from rl.envs.flow_env import DeepFlowEnv
 
@@ -213,29 +221,6 @@ def _search_best_feasible_legacy_split(raw_env: DeepFlowEnv) -> Tuple[Optional[L
     return best_action, best_info
 
 
-def _search_best_static_deepflow(raw_env: DeepFlowEnv) -> Tuple[Optional[List[int]], Optional[Dict]]:
-    """
-    Static DeepFlow baseline:
-      - partition fixed at 0
-      - search MB and K statically
-      - no RL
-    """
-    best_action = None
-    best_info = None
-    best_t = -1.0
-
-    for mb_idx in range(len(raw_env.mb_options)):
-        for k_idx in range(len(raw_env.k_options)):
-            action = [mb_idx, k_idx, 0]
-            info = _eval_action(raw_env, action)
-            if info["valid"] and info["feasible"] and info["throughput"] > best_t:
-                best_t = info["throughput"]
-                best_action = action
-                best_info = info
-
-    return best_action, best_info
-
-
 # ============================================================
 # Experiments
 # ============================================================
@@ -245,6 +230,7 @@ def experiment_1_best_ppo_vs_feasible_baselines(
     vec_env: VecNormalize,
     raw_env: DeepFlowEnv,
     recorder: ResultRecorder,
+    global_static: GlobalStaticSelection,
 ):
     print("\n[Experiment 1] Best PPO vs Best Feasible Baselines under Weak Network (1 Mbps, 50 ms, prompt=512)")
     print(f"{'Method':<26} | {'Strategy':<24} | {'Throughput(tok/s)':<20} | {'Speedup':<10}")
@@ -255,16 +241,25 @@ def experiment_1_best_ppo_vs_feasible_baselines(
     local_action, local_info = _search_best_feasible_strict_local_target(raw_env)
     remote_action, remote_info = _search_best_feasible_remote_target_without_speculation(raw_env)
     split_action, split_info = _search_best_feasible_legacy_split(raw_env)
-    static_action, static_info = _search_best_static_deepflow(raw_env)
+    no_pipeline_action = token_speculation_without_pipeline_action(raw_env)
+    no_pipeline_info = _eval_action(raw_env, no_pipeline_action)
+    global_static_action = list(global_static.action)
+    global_static_info = _eval_action(raw_env, global_static_action)
+    heuristic_action = heuristic_deepflow_action(raw_env, link_delay_ms=50.0, prompt_len=512)
+    heuristic_info = _eval_action(raw_env, heuristic_action)
     ppo_action, ppo_info = _eval_best_action(model, vec_env, raw_env)
+    oracle_action, oracle_info = search_per_scenario_oracle(raw_env)
 
     scenario_id = "experiment_1_1mbps_50ms_512"
     for policy_name, action, info in [
         ("strict_local_target", local_action, local_info),
         ("remote_target_without_speculation", remote_action, remote_info),
         ("best_feasible_legacy_activation_split", split_action, split_info),
-        ("per_scenario_token_oracle", static_action, static_info),
+        ("token_speculation_without_pipeline", no_pipeline_action, no_pipeline_info),
+        ("global_static_deepflow", global_static_action, global_static_info),
+        ("heuristic_deepflow", heuristic_action, heuristic_info),
         ("ppo_deepflow", ppo_action, ppo_info),
+        ("per_scenario_oracle", oracle_action, oracle_info),
     ]:
         if action is not None and info is not None:
             _record_result(recorder, scenario_id, policy_name, raw_env, 1.0, 50.0, 512, action, info)
@@ -283,10 +278,13 @@ def experiment_1_best_ppo_vs_feasible_baselines(
     if split_action is not None:
         _print_method_row("Best Feasible Legacy Split", _action_str(raw_env, split_action), split_info["throughput"], baseline_t)
 
-    if static_action is not None:
-        _print_method_row("Best Static DeepFlow", _action_str(raw_env, static_action), static_info["throughput"], baseline_t)
+    _print_method_row("Token Speculation without Pipeline", _action_str(raw_env, no_pipeline_action), no_pipeline_info["throughput"], baseline_t)
+    _print_method_row("Global Static DeepFlow", _action_str(raw_env, global_static_action), global_static_info["throughput"], baseline_t)
+    _print_method_row("Heuristic DeepFlow", _action_str(raw_env, heuristic_action), heuristic_info["throughput"], baseline_t)
 
     _print_method_row("Best PPO (Ours)", _action_str(raw_env, ppo_action), ppo_info["throughput"], baseline_t)
+    if oracle_action is not None:
+        _print_method_row("Per-scenario Oracle", _action_str(raw_env, oracle_action), oracle_info["throughput"], baseline_t)
 
     return {
         "local_action": local_action,
@@ -295,8 +293,12 @@ def experiment_1_best_ppo_vs_feasible_baselines(
         "remote_info": remote_info,
         "split_action": split_action,
         "split_info": split_info,
-        "static_action": static_action,
-        "static_info": static_info,
+        "global_static_action": global_static_action,
+        "global_static_info": global_static_info,
+        "heuristic_action": heuristic_action,
+        "heuristic_info": heuristic_info,
+        "oracle_action": oracle_action,
+        "oracle_info": oracle_info,
         "ppo_action": ppo_action,
         "ppo_info": ppo_info,
     }
@@ -307,10 +309,11 @@ def experiment_2_best_ppo_vs_best_static_deepflow(
     vec_env: VecNormalize,
     raw_env: DeepFlowEnv,
     recorder: ResultRecorder,
+    global_static: GlobalStaticSelection,
 ):
-    print("\n[Experiment 2] Best PPO vs Best Static DeepFlow across representative scenarios")
-    print(f"{'Scenario':<28} | {'Best Static DeepFlow':<20} | {'Best PPO':<12} | {'PPO Action':<22}")
-    print("-" * 100)
+    print("\n[Experiment 2] Global Static, Heuristic, PPO, and Oracle across representative scenarios")
+    print(f"{'Scenario':<28} | {'Global Static':<14} | {'Heuristic':<12} | {'PPO':<12} | {'Oracle':<12}")
+    print("-" * 102)
 
     scenarios = [
         ("Weak Net / Short Prompt", 1.0, 50.0, 512),
@@ -323,24 +326,28 @@ def experiment_2_best_ppo_vs_best_static_deepflow(
     for scenario_index, (name, bw, lat, prompt_len) in enumerate(scenarios, 1):
         _set_scenario(raw_env, bw=bw, lat=lat, prompt_len=prompt_len)
 
-        static_action, static_info = _search_best_static_deepflow(raw_env)
+        global_static_action = list(global_static.action)
+        global_static_info = _eval_action(raw_env, global_static_action)
+        heuristic_action = heuristic_deepflow_action(raw_env, link_delay_ms=lat, prompt_len=prompt_len)
+        heuristic_info = _eval_action(raw_env, heuristic_action)
         best_action, info_best = _eval_best_action(model, vec_env, raw_env)
+        oracle_action, oracle_info = search_per_scenario_oracle(raw_env)
 
-        static_t = static_info["throughput"] if static_info is not None else 0.0
-        if static_action is not None and static_info is not None:
-            _record_result(
-                recorder, f"experiment_2_{scenario_index}", "per_scenario_token_oracle",
-                raw_env, bw, lat, prompt_len, static_action, static_info,
-            )
+        scenario_id = f"experiment_2_{scenario_index}"
+        _record_result(recorder, scenario_id, "global_static_deepflow", raw_env, bw, lat, prompt_len, global_static_action, global_static_info)
+        _record_result(recorder, scenario_id, "heuristic_deepflow", raw_env, bw, lat, prompt_len, heuristic_action, heuristic_info)
         _record_result(
-            recorder, f"experiment_2_{scenario_index}", "ppo_deepflow",
+            recorder, scenario_id, "ppo_deepflow",
             raw_env, bw, lat, prompt_len, best_action, info_best,
         )
+        if oracle_action is not None and oracle_info is not None:
+            _record_result(recorder, scenario_id, "per_scenario_oracle", raw_env, bw, lat, prompt_len, oracle_action, oracle_info)
         print(
             f"{name:<28} | "
-            f"{static_t:<20.2f} | "
+            f"{global_static_info['throughput']:<14.2f} | "
+            f"{heuristic_info['throughput']:<12.2f} | "
             f"{info_best['throughput']:<12.2f} | "
-            f"{_action_str(raw_env, best_action):<22}"
+            f"{(oracle_info['throughput'] if oracle_info is not None else 0.0):<12.2f}"
         )
 
 
@@ -349,10 +356,11 @@ def experiment_3_bandwidth_sensitivity_best_ppo(
     vec_env: VecNormalize,
     raw_env: DeepFlowEnv,
     recorder: ResultRecorder,
+    global_static: GlobalStaticSelection,
 ):
-    print("\n[Experiment 3] Bandwidth Sensitivity: Best PPO vs Best Feasible Baselines (prompt=512, latency=50 ms)")
-    print(f"{'BW(Mbps)':<10} | {'Best Legacy Split':<18} | {'Best Static DeepFlow':<20} | {'Best PPO':<12} | {'PPO Action':<22}")
-    print("-" * 115)
+    print("\n[Experiment 3] Bandwidth Sensitivity: Legacy, Global Static, Heuristic, PPO, and Oracle")
+    print(f"{'BW(Mbps)':<10} | {'Legacy':<12} | {'Global Static':<14} | {'Heuristic':<12} | {'PPO':<12} | {'Oracle':<12}")
+    print("-" * 100)
 
     bandwidths = [0.5, 1.0, 2.0, 5.0, 10.0, 50.0, 100.0]
 
@@ -360,33 +368,36 @@ def experiment_3_bandwidth_sensitivity_best_ppo(
         _set_scenario(raw_env, bw=bw, lat=50.0, prompt_len=512)
 
         split_action, split_info = _search_best_feasible_legacy_split(raw_env)
-        static_action, static_info = _search_best_static_deepflow(raw_env)
+        global_static_action = list(global_static.action)
+        global_static_info = _eval_action(raw_env, global_static_action)
+        heuristic_action = heuristic_deepflow_action(raw_env, link_delay_ms=50.0, prompt_len=512)
+        heuristic_info = _eval_action(raw_env, heuristic_action)
         best_action, info_best = _eval_best_action(model, vec_env, raw_env)
+        oracle_action, oracle_info = search_per_scenario_oracle(raw_env)
 
         split_t = split_info["throughput"] if split_info is not None else 0.0
-        static_t = static_info["throughput"] if static_info is not None else 0.0
         scenario_id = f"experiment_3_bw_{scenario_index}"
         if split_action is not None and split_info is not None:
             _record_result(
                 recorder, scenario_id, "best_feasible_legacy_activation_split",
                 raw_env, bw, 50.0, 512, split_action, split_info,
             )
-        if static_action is not None and static_info is not None:
-            _record_result(
-                recorder, scenario_id, "per_scenario_token_oracle",
-                raw_env, bw, 50.0, 512, static_action, static_info,
-            )
+        _record_result(recorder, scenario_id, "global_static_deepflow", raw_env, bw, 50.0, 512, global_static_action, global_static_info)
+        _record_result(recorder, scenario_id, "heuristic_deepflow", raw_env, bw, 50.0, 512, heuristic_action, heuristic_info)
         _record_result(
             recorder, scenario_id, "ppo_deepflow",
             raw_env, bw, 50.0, 512, best_action, info_best,
         )
+        if oracle_action is not None and oracle_info is not None:
+            _record_result(recorder, scenario_id, "per_scenario_oracle", raw_env, bw, 50.0, 512, oracle_action, oracle_info)
 
         print(
             f"{bw:<10} | "
-            f"{split_t:<18.2f} | "
-            f"{static_t:<20.2f} | "
+            f"{split_t:<12.2f} | "
+            f"{global_static_info['throughput']:<14.2f} | "
+            f"{heuristic_info['throughput']:<12.2f} | "
             f"{info_best['throughput']:<12.2f} | "
-            f"{_action_str(raw_env, best_action):<22}"
+            f"{(oracle_info['throughput'] if oracle_info is not None else 0.0):<12.2f}"
         )
 
 
@@ -484,62 +495,52 @@ def experiment_5_action_distribution_grid(
                 )
 
 
-def experiment_6_compare_ppo_to_feasible_oracle(
+def experiment_6_independent_policy_comparison(
     model: PPO,
     vec_env: VecNormalize,
     raw_env: DeepFlowEnv,
     recorder: ResultRecorder,
+    global_static: GlobalStaticSelection,
 ):
-    """
-    新增：比较 PPO 与当前场景下的 feasible oracle（全动作枚举最优）。
-    """
-    print("\n[Experiment 6] Best PPO vs Feasible Oracle")
-    print(f"{'Scenario':<28} | {'Feasible Oracle':<18} | {'Best PPO':<12} | {'Oracle Action':<22} | {'PPO Action':<22}")
-    print("-" * 125)
+    print("\n[Experiment 6] Independent Test: Fixed, Heuristic, PPO, and Per-scenario Oracle")
+    print(f"{'Scenario':<30} | {'Global Static':<14} | {'Heuristic':<12} | {'PPO':<12} | {'Oracle':<12}")
+    print("-" * 106)
 
-    scenarios = [
-        ("Weak / 128", 1.0, 50.0, 128),
-        ("Weak / 512", 1.0, 50.0, 512),
-        ("Weak / 1024", 1.0, 50.0, 1024),
-        ("Weak / 1536", 1.0, 50.0, 1536),
-        ("Strong / 512", 100.0, 10.0, 512),
-        ("Strong / 1536", 100.0, 10.0, 1536),
-    ]
-
-    for scenario_index, (name, bw, lat, prompt_len) in enumerate(scenarios, 1):
+    for scenario_index, (name, bw, lat, prompt_len) in enumerate(INDEPENDENT_TEST_SCENARIOS, 1):
         _set_scenario(raw_env, bw=bw, lat=lat, prompt_len=prompt_len)
 
-        # brute-force feasible oracle
-        best_oracle_action = None
-        best_oracle_info = None
-        best_t = -1.0
-        for idx in range(raw_env.num_discrete_actions):
-            action = raw_env.unflatten_action(idx)
-            info = _eval_action(raw_env, action)
-            if info["valid"] and info["feasible"] and info["throughput"] > best_t:
-                best_t = info["throughput"]
-                best_oracle_action = action
-                best_oracle_info = info
-
+        local_action, local_info = _search_best_feasible_strict_local_target(raw_env)
+        remote_action, remote_info = _search_best_feasible_remote_target_without_speculation(raw_env)
+        legacy_action, legacy_info = _search_best_feasible_legacy_split(raw_env)
+        no_pipeline_action = token_speculation_without_pipeline_action(raw_env)
+        no_pipeline_info = _eval_action(raw_env, no_pipeline_action)
+        global_static_action = list(global_static.action)
+        global_static_info = _eval_action(raw_env, global_static_action)
+        heuristic_action = heuristic_deepflow_action(raw_env, link_delay_ms=lat, prompt_len=prompt_len)
+        heuristic_info = _eval_action(raw_env, heuristic_action)
         ppo_action, ppo_info = _eval_best_action(model, vec_env, raw_env)
+        oracle_action, oracle_info = search_per_scenario_oracle(raw_env)
 
-        oracle_t = best_oracle_info["throughput"] if best_oracle_info is not None else 0.0
-        if best_oracle_action is not None and best_oracle_info is not None:
-            _record_result(
-                recorder, f"experiment_6_{scenario_index}", "per_scenario_oracle",
-                raw_env, bw, lat, prompt_len, best_oracle_action, best_oracle_info,
-            )
-        _record_result(
-            recorder, f"experiment_6_{scenario_index}", "ppo_deepflow",
-            raw_env, bw, lat, prompt_len, ppo_action, ppo_info,
-        )
+        scenario_id = f"independent_test_{scenario_index}"
+        for policy_name, action, info in [
+            ("strict_local_target", local_action, local_info),
+            ("remote_target_without_speculation", remote_action, remote_info),
+            ("best_feasible_legacy_activation_split", legacy_action, legacy_info),
+            ("token_speculation_without_pipeline", no_pipeline_action, no_pipeline_info),
+            ("global_static_deepflow", global_static_action, global_static_info),
+            ("heuristic_deepflow", heuristic_action, heuristic_info),
+            ("ppo_deepflow", ppo_action, ppo_info),
+            ("per_scenario_oracle", oracle_action, oracle_info),
+        ]:
+            if action is not None and info is not None:
+                _record_result(recorder, scenario_id, policy_name, raw_env, bw, lat, prompt_len, action, info)
 
         print(
             f"{name:<28} | "
-            f"{oracle_t:<18.2f} | "
+            f"{global_static_info['throughput']:<14.2f} | "
+            f"{heuristic_info['throughput']:<12.2f} | "
             f"{ppo_info['throughput']:<12.2f} | "
-            f"{_action_str(raw_env, best_oracle_action):<22} | "
-            f"{_action_str(raw_env, ppo_action):<22}"
+            f"{(oracle_info['throughput'] if oracle_info is not None else 0.0):<12.2f}"
         )
 
 
@@ -566,13 +567,31 @@ def run_paper_experiments():
             vec_normalize_path=stats_path,
         ),
     )
+    global_static = select_global_static_deepflow(raw_env)
+    recorder.update_metadata(
+        global_static_deepflow=global_static.as_metadata(),
+        independent_test_scenarios=[
+            {
+                "scenario_id": scenario_id,
+                "bandwidth_mbps": bandwidth,
+                "link_delay_ms": link_delay,
+                "prompt_len": prompt_len,
+            }
+            for scenario_id, bandwidth, link_delay, prompt_len in INDEPENDENT_TEST_SCENARIOS
+        ],
+    )
+    print(
+        "Global Static calibration: "
+        f"{_action_str(raw_env, list(global_static.action))}, "
+        f"mean Oracle ratio={global_static.mean_oracle_ratio:.4f}"
+    )
 
-    experiment_1_best_ppo_vs_feasible_baselines(model, vec_env, raw_env, recorder)
-    experiment_2_best_ppo_vs_best_static_deepflow(model, vec_env, raw_env, recorder)
-    experiment_3_bandwidth_sensitivity_best_ppo(model, vec_env, raw_env, recorder)
+    experiment_1_best_ppo_vs_feasible_baselines(model, vec_env, raw_env, recorder, global_static)
+    experiment_2_best_ppo_vs_best_static_deepflow(model, vec_env, raw_env, recorder, global_static)
+    experiment_3_bandwidth_sensitivity_best_ppo(model, vec_env, raw_env, recorder, global_static)
     experiment_4_action_sensitivity_table(model, vec_env, raw_env, recorder)
     experiment_5_action_distribution_grid(model, vec_env, raw_env, recorder)
-    experiment_6_compare_ppo_to_feasible_oracle(model, vec_env, raw_env, recorder)
+    experiment_6_independent_policy_comparison(model, vec_env, raw_env, recorder, global_static)
 
     json_path, csv_path = recorder.write()
     print(f"Structured JSON results: {json_path}")

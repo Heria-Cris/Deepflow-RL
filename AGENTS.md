@@ -81,7 +81,8 @@ TinyLlama-1.1B 为草稿模型、Llama-2-7B 为目标模型。这些设备参数
 
 ### 场景、动作与指标语义
 
-- 观测状态：`[bandwidth_mbps, latency_ms, prompt_len, last_throughput]`。
+- 观测状态：`[bandwidth_mbps, link_delay_ms, prompt_len]`。单步环境中动作选择前的
+  `last_throughput` 没有信息量，已从 PPO 输入中移除；现有四维模型产物不得复用。
 - PPO 内部动作顺序为 `[mb_idx, k_idx, partition_point]`，与论文的 `(P, K, M)`
   记号顺序不同。
 - `MB` 候选为 `[1, 2, 4, 8, 16, 32]`；`K` 候选为 `[0, 1, 3, 5, 7, 10]`；`P`
@@ -100,7 +101,8 @@ TinyLlama-1.1B 为草稿模型、Llama-2-7B 为目标模型。这些设备参数
 ## PPO 与模型产物约束
 
 训练使用 8 个采用域随机化的并行环境。带宽在 `[0.5, 100] Mbps` 上按对数均匀
-采样，延迟在 `[5, 120] ms` 上均匀采样，Prompt 长度从 `128..8192` 中采样。
+采样，延迟在 `[5, 120] ms` 上均匀采样，Prompt 长度从 `{128,512,1024,1536}` 中采样；
+`2048/4096/8192` 仅用于后续上下文边界审计，不进入主性能或 PPO 场景。
 `train_phase5.py` 当前使用双层、每层 256 单元的 actor/critic，学习率 `2e-4`、
 `n_steps=512`、批大小 `256` 和 350,000 个训练步数。状态和奖励通过
 `VecNormalize` 归一化。
