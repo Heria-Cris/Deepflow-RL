@@ -7,6 +7,7 @@ import numpy as np
 from stable_baselines3 import PPO
 from stable_baselines3.common.vec_env import DummyVecEnv, VecMonitor, VecNormalize
 
+from result_tracking import ResultRecorder, build_run_metadata
 from rl.envs.flow_env import DeepFlowEnv
 
 
@@ -62,7 +63,7 @@ def load_best_agent():
             "The saved PPO model is incompatible with the current observation space. Retrain it "
             "with train_phase5.py and keep it paired with the matching VecNormalize artifact."
         ) from exc
-    return model, env
+    return model, env, model_path, stats_path
 
 
 # ============================================================
@@ -116,6 +117,29 @@ def _format_speedup(x: float, base: float) -> str:
 
 def _print_method_row(method: str, strategy: str, throughput: float, speedup_base: float):
     print(f"{method:<26} | {strategy:<24} | {throughput:<20.2f} | {_format_speedup(throughput, speedup_base):<10}")
+
+
+def _record_result(
+    recorder: ResultRecorder,
+    scenario_id: str,
+    policy_name: str,
+    raw_env: DeepFlowEnv,
+    bandwidth_mbps: float,
+    link_delay_ms: float,
+    prompt_len: int,
+    action: List[int],
+    info: Dict,
+):
+    recorder.record(
+        scenario_id=scenario_id,
+        bandwidth_mbps=bandwidth_mbps,
+        link_delay_ms=link_delay_ms,
+        prompt_len=prompt_len,
+        policy_name=policy_name,
+        action=action,
+        info=info,
+        environment=raw_env,
+    )
 
 
 # ============================================================
@@ -216,7 +240,12 @@ def _search_best_static_deepflow(raw_env: DeepFlowEnv) -> Tuple[Optional[List[in
 # Experiments
 # ============================================================
 
-def experiment_1_best_ppo_vs_feasible_baselines(model: PPO, vec_env: VecNormalize, raw_env: DeepFlowEnv):
+def experiment_1_best_ppo_vs_feasible_baselines(
+    model: PPO,
+    vec_env: VecNormalize,
+    raw_env: DeepFlowEnv,
+    recorder: ResultRecorder,
+):
     print("\n[Experiment 1] Best PPO vs Best Feasible Baselines under Weak Network (1 Mbps, 50 ms, prompt=512)")
     print(f"{'Method':<26} | {'Strategy':<24} | {'Throughput(tok/s)':<20} | {'Speedup':<10}")
     print("-" * 100)
@@ -228,6 +257,17 @@ def experiment_1_best_ppo_vs_feasible_baselines(model: PPO, vec_env: VecNormaliz
     split_action, split_info = _search_best_feasible_legacy_split(raw_env)
     static_action, static_info = _search_best_static_deepflow(raw_env)
     ppo_action, ppo_info = _eval_best_action(model, vec_env, raw_env)
+
+    scenario_id = "experiment_1_1mbps_50ms_512"
+    for policy_name, action, info in [
+        ("strict_local_target", local_action, local_info),
+        ("remote_target_without_speculation", remote_action, remote_info),
+        ("best_feasible_legacy_activation_split", split_action, split_info),
+        ("per_scenario_token_oracle", static_action, static_info),
+        ("ppo_deepflow", ppo_action, ppo_info),
+    ]:
+        if action is not None and info is not None:
+            _record_result(recorder, scenario_id, policy_name, raw_env, 1.0, 50.0, 512, action, info)
 
     # 用 best feasible local-only 作为 speedup 参考
     baseline_t = local_info["throughput"] if local_info is not None else 0.0
@@ -262,7 +302,12 @@ def experiment_1_best_ppo_vs_feasible_baselines(model: PPO, vec_env: VecNormaliz
     }
 
 
-def experiment_2_best_ppo_vs_best_static_deepflow(model: PPO, vec_env: VecNormalize, raw_env: DeepFlowEnv):
+def experiment_2_best_ppo_vs_best_static_deepflow(
+    model: PPO,
+    vec_env: VecNormalize,
+    raw_env: DeepFlowEnv,
+    recorder: ResultRecorder,
+):
     print("\n[Experiment 2] Best PPO vs Best Static DeepFlow across representative scenarios")
     print(f"{'Scenario':<28} | {'Best Static DeepFlow':<20} | {'Best PPO':<12} | {'PPO Action':<22}")
     print("-" * 100)
@@ -275,13 +320,22 @@ def experiment_2_best_ppo_vs_best_static_deepflow(model: PPO, vec_env: VecNormal
         ("Strong Net / Long Prompt", 100.0, 10.0, 1536),
     ]
 
-    for name, bw, lat, prompt_len in scenarios:
+    for scenario_index, (name, bw, lat, prompt_len) in enumerate(scenarios, 1):
         _set_scenario(raw_env, bw=bw, lat=lat, prompt_len=prompt_len)
 
         static_action, static_info = _search_best_static_deepflow(raw_env)
         best_action, info_best = _eval_best_action(model, vec_env, raw_env)
 
         static_t = static_info["throughput"] if static_info is not None else 0.0
+        if static_action is not None and static_info is not None:
+            _record_result(
+                recorder, f"experiment_2_{scenario_index}", "per_scenario_token_oracle",
+                raw_env, bw, lat, prompt_len, static_action, static_info,
+            )
+        _record_result(
+            recorder, f"experiment_2_{scenario_index}", "ppo_deepflow",
+            raw_env, bw, lat, prompt_len, best_action, info_best,
+        )
         print(
             f"{name:<28} | "
             f"{static_t:<20.2f} | "
@@ -290,14 +344,19 @@ def experiment_2_best_ppo_vs_best_static_deepflow(model: PPO, vec_env: VecNormal
         )
 
 
-def experiment_3_bandwidth_sensitivity_best_ppo(model: PPO, vec_env: VecNormalize, raw_env: DeepFlowEnv):
+def experiment_3_bandwidth_sensitivity_best_ppo(
+    model: PPO,
+    vec_env: VecNormalize,
+    raw_env: DeepFlowEnv,
+    recorder: ResultRecorder,
+):
     print("\n[Experiment 3] Bandwidth Sensitivity: Best PPO vs Best Feasible Baselines (prompt=512, latency=50 ms)")
     print(f"{'BW(Mbps)':<10} | {'Best Legacy Split':<18} | {'Best Static DeepFlow':<20} | {'Best PPO':<12} | {'PPO Action':<22}")
     print("-" * 115)
 
     bandwidths = [0.5, 1.0, 2.0, 5.0, 10.0, 50.0, 100.0]
 
-    for bw in bandwidths:
+    for scenario_index, bw in enumerate(bandwidths, 1):
         _set_scenario(raw_env, bw=bw, lat=50.0, prompt_len=512)
 
         split_action, split_info = _search_best_feasible_legacy_split(raw_env)
@@ -306,6 +365,21 @@ def experiment_3_bandwidth_sensitivity_best_ppo(model: PPO, vec_env: VecNormaliz
 
         split_t = split_info["throughput"] if split_info is not None else 0.0
         static_t = static_info["throughput"] if static_info is not None else 0.0
+        scenario_id = f"experiment_3_bw_{scenario_index}"
+        if split_action is not None and split_info is not None:
+            _record_result(
+                recorder, scenario_id, "best_feasible_legacy_activation_split",
+                raw_env, bw, 50.0, 512, split_action, split_info,
+            )
+        if static_action is not None and static_info is not None:
+            _record_result(
+                recorder, scenario_id, "per_scenario_token_oracle",
+                raw_env, bw, 50.0, 512, static_action, static_info,
+            )
+        _record_result(
+            recorder, scenario_id, "ppo_deepflow",
+            raw_env, bw, 50.0, 512, best_action, info_best,
+        )
 
         print(
             f"{bw:<10} | "
@@ -316,7 +390,12 @@ def experiment_3_bandwidth_sensitivity_best_ppo(model: PPO, vec_env: VecNormaliz
         )
 
 
-def experiment_4_action_sensitivity_table(model: PPO, vec_env: VecNormalize, raw_env: DeepFlowEnv):
+def experiment_4_action_sensitivity_table(
+    model: PPO,
+    vec_env: VecNormalize,
+    raw_env: DeepFlowEnv,
+    recorder: ResultRecorder,
+):
     print("\n[Experiment 4] Action Sensitivity Analysis (Does the PPO action change with scenario?)")
     print(
         f"{'Scenario':<28} | {'BW':<8} | {'Lat(ms)':<8} | {'Prompt':<8} | "
@@ -338,7 +417,7 @@ def experiment_4_action_sensitivity_table(model: PPO, vec_env: VecNormalize, raw
     prev_action = None
     unique_actions = set()
 
-    for name, bw, lat, prompt_len in scenarios:
+    for scenario_index, (name, bw, lat, prompt_len) in enumerate(scenarios, 1):
         _set_scenario(raw_env, bw=bw, lat=lat, prompt_len=prompt_len)
         action, info = _eval_best_action(model, vec_env, raw_env)
 
@@ -347,6 +426,11 @@ def experiment_4_action_sensitivity_table(model: PPO, vec_env: VecNormalize, raw
 
         changed = "N/A" if prev_action is None else ("Yes" if action != prev_action else "No")
         prev_action = action
+
+        _record_result(
+            recorder, f"experiment_4_{scenario_index}", "ppo_deepflow",
+            raw_env, bw, lat, prompt_len, action, info,
+        )
 
         print(
             f"{name:<28} | "
@@ -364,7 +448,12 @@ def experiment_4_action_sensitivity_table(model: PPO, vec_env: VecNormalize, raw
         print(f"  {idx}. {action_name}")
 
 
-def experiment_5_action_distribution_grid(model: PPO, vec_env: VecNormalize, raw_env: DeepFlowEnv):
+def experiment_5_action_distribution_grid(
+    model: PPO,
+    vec_env: VecNormalize,
+    raw_env: DeepFlowEnv,
+    recorder: ResultRecorder,
+):
     print("\n[Experiment 5] PPO Action Grid over Network/Prompt Conditions")
     print(f"{'BW':<8} | {'Lat':<8} | {'Prompt':<8} | {'PPO Action':<22} | {'Throughput':<12}")
     print("-" * 78)
@@ -373,11 +462,18 @@ def experiment_5_action_distribution_grid(model: PPO, vec_env: VecNormalize, raw
     latencies = [10.0, 50.0, 100.0]
     prompts = [128, 512, 1024, 1536]
 
+    scenario_index = 0
     for bw in bandwidths:
         for lat in latencies:
             for prompt_len in prompts:
+                scenario_index += 1
                 _set_scenario(raw_env, bw=bw, lat=lat, prompt_len=prompt_len)
                 action, info = _eval_best_action(model, vec_env, raw_env)
+
+                _record_result(
+                    recorder, f"experiment_5_{scenario_index}", "ppo_deepflow",
+                    raw_env, bw, lat, prompt_len, action, info,
+                )
 
                 print(
                     f"{bw:<8.1f} | "
@@ -388,7 +484,12 @@ def experiment_5_action_distribution_grid(model: PPO, vec_env: VecNormalize, raw
                 )
 
 
-def experiment_6_compare_ppo_to_feasible_oracle(model: PPO, vec_env: VecNormalize, raw_env: DeepFlowEnv):
+def experiment_6_compare_ppo_to_feasible_oracle(
+    model: PPO,
+    vec_env: VecNormalize,
+    raw_env: DeepFlowEnv,
+    recorder: ResultRecorder,
+):
     """
     新增：比较 PPO 与当前场景下的 feasible oracle（全动作枚举最优）。
     """
@@ -405,7 +506,7 @@ def experiment_6_compare_ppo_to_feasible_oracle(model: PPO, vec_env: VecNormaliz
         ("Strong / 1536", 100.0, 10.0, 1536),
     ]
 
-    for name, bw, lat, prompt_len in scenarios:
+    for scenario_index, (name, bw, lat, prompt_len) in enumerate(scenarios, 1):
         _set_scenario(raw_env, bw=bw, lat=lat, prompt_len=prompt_len)
 
         # brute-force feasible oracle
@@ -423,6 +524,15 @@ def experiment_6_compare_ppo_to_feasible_oracle(model: PPO, vec_env: VecNormaliz
         ppo_action, ppo_info = _eval_best_action(model, vec_env, raw_env)
 
         oracle_t = best_oracle_info["throughput"] if best_oracle_info is not None else 0.0
+        if best_oracle_action is not None and best_oracle_info is not None:
+            _record_result(
+                recorder, f"experiment_6_{scenario_index}", "per_scenario_oracle",
+                raw_env, bw, lat, prompt_len, best_oracle_action, best_oracle_info,
+            )
+        _record_result(
+            recorder, f"experiment_6_{scenario_index}", "ppo_deepflow",
+            raw_env, bw, lat, prompt_len, ppo_action, ppo_info,
+        )
 
         print(
             f"{name:<28} | "
@@ -442,15 +552,31 @@ def run_paper_experiments():
     print("📊 DeepFlow-RL - Unified Paper Experiments (Best Feasible Baselines + PPO)")
     print("=" * 86)
 
-    model, vec_env = load_best_agent()
+    model, vec_env, model_path, stats_path = load_best_agent()
     raw_env = vec_env.envs[0]
+    recorder = ResultRecorder(
+        output_dir=os.path.join("results", "paper_experiments"),
+        metadata=build_run_metadata(
+            suite="paper_experiments",
+            config_dir=raw_env.config_dir,
+            total_batch_size=raw_env.total_batch_size,
+            pressure_profile="base",
+            random_seed=123,
+            ppo_model_path=model_path,
+            vec_normalize_path=stats_path,
+        ),
+    )
 
-    experiment_1_best_ppo_vs_feasible_baselines(model, vec_env, raw_env)
-    experiment_2_best_ppo_vs_best_static_deepflow(model, vec_env, raw_env)
-    experiment_3_bandwidth_sensitivity_best_ppo(model, vec_env, raw_env)
-    experiment_4_action_sensitivity_table(model, vec_env, raw_env)
-    experiment_5_action_distribution_grid(model, vec_env, raw_env)
-    experiment_6_compare_ppo_to_feasible_oracle(model, vec_env, raw_env)
+    experiment_1_best_ppo_vs_feasible_baselines(model, vec_env, raw_env, recorder)
+    experiment_2_best_ppo_vs_best_static_deepflow(model, vec_env, raw_env, recorder)
+    experiment_3_bandwidth_sensitivity_best_ppo(model, vec_env, raw_env, recorder)
+    experiment_4_action_sensitivity_table(model, vec_env, raw_env, recorder)
+    experiment_5_action_distribution_grid(model, vec_env, raw_env, recorder)
+    experiment_6_compare_ppo_to_feasible_oracle(model, vec_env, raw_env, recorder)
+
+    json_path, csv_path = recorder.write()
+    print(f"Structured JSON results: {json_path}")
+    print(f"Structured CSV results : {csv_path}")
 
     print("\n✅ All experiments completed.")
 
