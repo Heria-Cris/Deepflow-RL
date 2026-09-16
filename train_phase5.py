@@ -1,15 +1,26 @@
-# train_phase5.py
+"""Train a reproducible PPO run for one explicitly selected random seed."""
+
+import argparse
+import json
 import os
 import numpy as np
-from typing import Callable
+from pathlib import Path
+from typing import Callable, Dict, Optional, Sequence
 
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import BaseCallback, CallbackList, CheckpointCallback
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.utils import set_random_seed
 from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv, VecMonitor, VecNormalize
 
+from result_tracking import build_run_metadata
 from rl.envs.flow_env import DeepFlowEnv
+
+
+PPO_RETRAIN_SEEDS = (42, 20260912, 20261127)
+DEFAULT_TOTAL_TIMESTEPS = 350_000
+DEFAULT_NUM_ENVS = 8
 
 
 class StrategyLoggerCallback(BaseCallback):
@@ -176,14 +187,14 @@ def make_env(rank: int, seed: int, config_dir: str = "configs") -> Callable:
     return _init
 
 
-def make_eval_env(config_dir: str = "configs"):
+def make_eval_env(seed: int, config_dir: str = "configs"):
     def _init():
         env = DeepFlowEnv(
             config_dir=config_dir,
             total_batch_size=32,
             episode_len=1,
             domain_randomization=True,
-            seed=12345,
+            seed=seed + 10_000,
             reward_mode="shaped",
         )
         env = Monitor(env)
@@ -201,25 +212,94 @@ def make_eval_env(config_dir: str = "configs"):
     return env
 
 
-def train():
+def build_training_paths(seed: int, output_root: str = "models/ppo_deepflow/seeds") -> Dict[str, str]:
+    run_dir = os.path.join(output_root, f"seed_{seed}")
+    return {
+        "run_dir": run_dir,
+        "best_dir": os.path.join(run_dir, "best_model"),
+        "checkpoint_dir": os.path.join(run_dir, "checkpoints"),
+        "log_dir": os.path.join("logs", "ppo_retrain", f"seed_{seed}"),
+        "final_model_path": os.path.join(run_dir, "final_model"),
+        "final_vecnorm_path": os.path.join(run_dir, "vec_normalize.pkl"),
+        "metadata_path": os.path.join(run_dir, "training_metadata.json"),
+    }
+
+
+def write_training_metadata(
+    paths: Dict[str, str],
+    *,
+    seed: int,
+    total_timesteps: int,
+    num_envs: int,
+    config_dir: str,
+    completed: bool,
+) -> None:
+    final_model_path = f"{paths['final_model_path']}.zip" if completed else None
+    final_vecnorm_path = paths["final_vecnorm_path"] if completed else None
+    metadata = build_run_metadata(
+        suite=f"ppo_training_seed_{seed}",
+        config_dir=config_dir,
+        total_batch_size=32,
+        pressure_profile="base",
+        random_seed=seed,
+        ppo_model_path=final_model_path,
+        vec_normalize_path=final_vecnorm_path,
+    )
+    metadata.update({
+        "completed": completed,
+        "seed": seed,
+        "total_timesteps": total_timesteps,
+        "num_envs": num_envs,
+        "algorithm": "PPO",
+        "observation_contract": ["bandwidth_mbps", "link_delay_ms", "prompt_len"],
+        "best_model_path": f"{os.path.join(paths['best_dir'], 'best_model')}.zip",
+        "best_vec_normalize_path": os.path.join(paths["best_dir"], "vec_normalize.pkl"),
+    })
+
+    Path(paths["metadata_path"]).write_text(
+        json.dumps(metadata, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+
+def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--seed", type=int, default=42, choices=PPO_RETRAIN_SEEDS)
+    parser.add_argument("--total-timesteps", type=int, default=DEFAULT_TOTAL_TIMESTEPS)
+    parser.add_argument("--num-envs", type=int, default=DEFAULT_NUM_ENVS)
+    parser.add_argument("--config-dir", default="configs")
+    parser.add_argument("--output-root", default="models/ppo_deepflow/seeds")
+    return parser.parse_args(argv)
+
+
+def train(args: argparse.Namespace):
     print("=" * 78)
-    print("🚀 DeepFlow-RL - PPO Retraining with Updated Reward Shaping")
+    print("🚀 DeepFlow-RL - Seeded PPO Retraining")
     print("=" * 78)
 
-    models_dir = "models/ppo_deepflow"
-    best_dir = os.path.join(models_dir, "best_model")
-    ckpt_dir = os.path.join(models_dir, "checkpoints")
-    log_dir = "logs/ppo_memory_v3_rewardfix"
+    seed = int(args.seed)
+    total_timesteps = int(args.total_timesteps)
+    num_envs = int(args.num_envs)
+    if total_timesteps <= 0:
+        raise ValueError("total_timesteps must be positive")
+    if num_envs <= 0:
+        raise ValueError("num_envs must be positive")
 
-    os.makedirs(models_dir, exist_ok=True)
-    os.makedirs(best_dir, exist_ok=True)
-    os.makedirs(ckpt_dir, exist_ok=True)
-    os.makedirs(log_dir, exist_ok=True)
+    paths = build_training_paths(seed, args.output_root)
+    for directory in (paths["run_dir"], paths["best_dir"], paths["checkpoint_dir"], paths["log_dir"]):
+        os.makedirs(directory, exist_ok=True)
 
-    seed = 42
-    num_envs = 8
+    set_random_seed(seed)
+    write_training_metadata(
+        paths,
+        seed=seed,
+        total_timesteps=total_timesteps,
+        num_envs=num_envs,
+        config_dir=args.config_dir,
+        completed=False,
+    )
 
-    env_fns = [make_env(rank=i, seed=seed, config_dir="configs") for i in range(num_envs)]
+    env_fns = [make_env(rank=i, seed=seed, config_dir=args.config_dir) for i in range(num_envs)]
     train_env = SubprocVecEnv(env_fns)
     train_env = VecMonitor(train_env)
     train_env = VecNormalize(
@@ -232,7 +312,7 @@ def train():
         training=True,
     )
 
-    eval_env = make_eval_env(config_dir="configs")
+    eval_env = make_eval_env(seed=seed, config_dir=args.config_dir)
 
     model = PPO(
         policy="MlpPolicy",
@@ -248,7 +328,7 @@ def train():
         ent_coef=0.03,
         vf_coef=0.5,
         max_grad_norm=0.5,
-        tensorboard_log=log_dir,
+        tensorboard_log=paths["log_dir"],
         seed=seed,
         policy_kwargs=dict(
             net_arch=dict(pi=[256, 256], vf=[256, 256])
@@ -257,8 +337,8 @@ def train():
 
     checkpoint_callback = CheckpointCallback(
         save_freq=max(5000 // num_envs, 1),
-        save_path=ckpt_dir,
-        name_prefix="ppo_memory_v3_rewardfix",
+        save_path=paths["checkpoint_dir"],
+        name_prefix=f"ppo_seed_{seed}",
         save_vecnormalize=True,
     )
 
@@ -266,7 +346,7 @@ def train():
         eval_env=eval_env,
         eval_freq=max(10000 // num_envs, 1),
         n_eval_episodes=50,
-        best_model_save_path=best_dir,
+        best_model_save_path=paths["best_dir"],
         verbose=1,
     )
 
@@ -280,32 +360,36 @@ def train():
         feasibility_logger,
     ])
 
-    total_timesteps = 350_000
-
-    print(f"Training with {num_envs} parallel envs, total_timesteps={total_timesteps}")
-    print("TensorBoard logdir:", log_dir)
+    print(f"Training seed={seed}, parallel envs={num_envs}, total_timesteps={total_timesteps}")
+    print("Run directory:", paths["run_dir"])
+    print("TensorBoard logdir:", paths["log_dir"])
 
     model.learn(
         total_timesteps=total_timesteps,
         callback=callback,
         progress_bar=True,
-        tb_log_name="ppo_memory_v3_rewardfix",
+        tb_log_name=f"ppo_seed_{seed}",
     )
 
     print("\n✅ Training finished. Saving final model...")
 
-    final_model_path = os.path.join(models_dir, "final_model")
-    final_vecnorm_path = os.path.join(models_dir, "vec_normalize.pkl")
+    model.save(paths["final_model_path"])
+    train_env.save(paths["final_vecnorm_path"])
+    write_training_metadata(
+        paths,
+        seed=seed,
+        total_timesteps=total_timesteps,
+        num_envs=num_envs,
+        config_dir=args.config_dir,
+        completed=True,
+    )
 
-    model.save(final_model_path)
-    train_env.save(final_vecnorm_path)
-
-    print(f"Saved final model to {final_model_path}.zip")
-    print(f"Saved normalization stats to {final_vecnorm_path}")
+    print(f"Saved final model to {paths['final_model_path']}.zip")
+    print(f"Saved normalization stats to {paths['final_vecnorm_path']}")
 
     train_env.close()
     eval_env.close()
 
 
 if __name__ == "__main__":
-    train()
+    train(parse_args())

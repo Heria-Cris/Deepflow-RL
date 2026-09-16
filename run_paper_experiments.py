@@ -1,7 +1,9 @@
-# run_paper_experiments.py
+"""Run reproducible paper experiments with an explicitly paired PPO artifact."""
+
+import argparse
 import os
 from pickle import UnpicklingError
-from typing import Dict, List, Tuple, Optional
+from typing import Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 from stable_baselines3 import PPO
@@ -23,10 +25,10 @@ from rl.envs.flow_env import DeepFlowEnv
 # Environment / Model Loading
 # ============================================================
 
-def build_base_env():
+def build_base_env(config_dir: str = "configs"):
     env = DummyVecEnv([
         lambda: DeepFlowEnv(
-            config_dir="configs",
+            config_dir=config_dir,
             total_batch_size=32,
             episode_len=1,
             domain_randomization=False,
@@ -38,20 +40,47 @@ def build_base_env():
     return env
 
 
-def load_best_agent():
+def resolve_agent_artifacts(
+    model_path: Optional[str] = None,
+    vec_normalize_path: Optional[str] = None,
+) -> Tuple[str, str]:
+    """Select a model/statistics pair without permitting cross-run fallbacks."""
+    if (model_path is None) != (vec_normalize_path is None):
+        raise ValueError(
+            "--model-path and --vec-normalize-path must be supplied together so that "
+            "the PPO policy is evaluated with its own VecNormalize statistics."
+        )
+
+    if model_path is not None and vec_normalize_path is not None:
+        if not os.path.isfile(model_path):
+            raise FileNotFoundError(f"PPO model artifact not found: {model_path}")
+        if not os.path.isfile(vec_normalize_path):
+            raise FileNotFoundError(f"VecNormalize artifact not found: {vec_normalize_path}")
+        return model_path, vec_normalize_path
+
     best_model_path = "models/ppo_deepflow/best_model/best_model.zip"
     best_stats_path = "models/ppo_deepflow/best_model/vec_normalize.pkl"
     final_model_path = "models/ppo_deepflow/final_model.zip"
     final_stats_path = "models/ppo_deepflow/vec_normalize.pkl"
 
     if os.path.exists(best_model_path) and os.path.exists(best_stats_path):
-        model_path = best_model_path
-        stats_path = best_stats_path
-    else:
-        model_path = final_model_path
-        stats_path = final_stats_path
+        return best_model_path, best_stats_path
+    if os.path.exists(final_model_path) and os.path.exists(final_stats_path):
+        return final_model_path, final_stats_path
+    raise FileNotFoundError(
+        "No default PPO/VecNormalize pair is available. Supply --model-path and "
+        "--vec-normalize-path for a seed-specific evaluation."
+    )
 
-    base_env = build_base_env()
+
+def load_best_agent(
+    model_path: Optional[str] = None,
+    vec_normalize_path: Optional[str] = None,
+    config_dir: str = "configs",
+):
+    model_path, stats_path = resolve_agent_artifacts(model_path, vec_normalize_path)
+
+    base_env = build_base_env(config_dir=config_dir)
     try:
         env = VecNormalize.load(stats_path, base_env)
     except (UnpicklingError, ValueError) as exc:
@@ -548,21 +577,45 @@ def experiment_6_independent_policy_comparison(
 # Main
 # ============================================================
 
-def run_paper_experiments():
+def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--model-path", help="Seed-specific PPO .zip artifact path.")
+    parser.add_argument("--vec-normalize-path", help="Paired seed-specific VecNormalize .pkl path.")
+    parser.add_argument("--output-dir", default=os.path.join("results", "paper_experiments"))
+    parser.add_argument("--suite-name", default="paper_experiments")
+    parser.add_argument("--config-dir", default="configs")
+    parser.add_argument("--random-seed", type=int, default=123)
+    parser.add_argument(
+        "--only-independent-test",
+        action="store_true",
+        help="Run Global Static calibration and the 32-scenario independent test only.",
+    )
+    args = parser.parse_args(argv)
+    if (args.model_path is None) != (args.vec_normalize_path is None):
+        parser.error("--model-path and --vec-normalize-path must be specified together")
+    return args
+
+
+def run_paper_experiments(args: Optional[argparse.Namespace] = None):
+    args = args or parse_args()
     print("=" * 86)
     print("📊 DeepFlow-RL - Unified Paper Experiments (Best Feasible Baselines + PPO)")
     print("=" * 86)
 
-    model, vec_env, model_path, stats_path = load_best_agent()
+    model, vec_env, model_path, stats_path = load_best_agent(
+        model_path=args.model_path,
+        vec_normalize_path=args.vec_normalize_path,
+        config_dir=args.config_dir,
+    )
     raw_env = vec_env.envs[0]
     recorder = ResultRecorder(
-        output_dir=os.path.join("results", "paper_experiments"),
+        output_dir=args.output_dir,
         metadata=build_run_metadata(
-            suite="paper_experiments",
+            suite=args.suite_name,
             config_dir=raw_env.config_dir,
             total_batch_size=raw_env.total_batch_size,
             pressure_profile="base",
-            random_seed=123,
+            random_seed=args.random_seed,
             ppo_model_path=model_path,
             vec_normalize_path=stats_path,
         ),
@@ -586,11 +639,12 @@ def run_paper_experiments():
         f"mean Oracle ratio={global_static.mean_oracle_ratio:.4f}"
     )
 
-    experiment_1_best_ppo_vs_feasible_baselines(model, vec_env, raw_env, recorder, global_static)
-    experiment_2_best_ppo_vs_best_static_deepflow(model, vec_env, raw_env, recorder, global_static)
-    experiment_3_bandwidth_sensitivity_best_ppo(model, vec_env, raw_env, recorder, global_static)
-    experiment_4_action_sensitivity_table(model, vec_env, raw_env, recorder)
-    experiment_5_action_distribution_grid(model, vec_env, raw_env, recorder)
+    if not args.only_independent_test:
+        experiment_1_best_ppo_vs_feasible_baselines(model, vec_env, raw_env, recorder, global_static)
+        experiment_2_best_ppo_vs_best_static_deepflow(model, vec_env, raw_env, recorder, global_static)
+        experiment_3_bandwidth_sensitivity_best_ppo(model, vec_env, raw_env, recorder, global_static)
+        experiment_4_action_sensitivity_table(model, vec_env, raw_env, recorder)
+        experiment_5_action_distribution_grid(model, vec_env, raw_env, recorder)
     experiment_6_independent_policy_comparison(model, vec_env, raw_env, recorder, global_static)
 
     json_path, csv_path = recorder.write()
@@ -601,4 +655,4 @@ def run_paper_experiments():
 
 
 if __name__ == "__main__":
-    run_paper_experiments()
+    run_paper_experiments(parse_args())
