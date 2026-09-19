@@ -1,0 +1,25 @@
+                                                   Independent-test comparison across three PPO seeds
+
+                         35                                                                    31.48                         31.95  33.26
+
+                                                                                        31.37
+
+                         30
+
+Mean throughput (tok/s)  25
+
+                         20        19.27
+
+                                                   15.95  16.32
+
+                         15
+
+                         10
+
+                         5   3.08
+
+                         0 cal arget               Legacy S Token, p n l o it pipeline  Global S Froz ta e t n ic Heuristic  P Per-scen P a O rio Oracle
+                                                T
+
+                             Strict Lo Remote
+

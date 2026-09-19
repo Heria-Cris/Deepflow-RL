@@ -1,0 +1,23 @@
+                           18 Position and memory constrained action space        LLaMA-style 7B
+
+                           16                                                     LLaMA-style 13B
+
+                           14 13.0%
+
+Feasible action ratio (%)  12
+
+                                                       9.6%
+
+                           10
+
+                           8
+
+                           6
+
+                           4
+
+                           2                                 0.0%  0.0%     0.0%        0.0%
+                           0 2048
+                                                                 4096             8192
+                                                             Prompt length
+

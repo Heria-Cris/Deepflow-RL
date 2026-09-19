@@ -1,0 +1,12 @@
+                                     Independent-test throughput by bandwidth stratum
+
+Mean throughput (tok/s)  30
+                         25
+                         20          3 Bandwidth stratum (Mbps, log scale) 20          Legacy Split
+                         15                                                            Global Static
+                         10                                                            Frozen Heuristic
+                                                                                       PPO
+                               0.75                                                    Per-scenario Oracle
+
+                                                                                                 75
+

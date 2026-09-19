@@ -1,0 +1,7 @@
+target_model_key,target_model_config,config_hash,prompt_len,total_actions,feasible_actions,feasible_rate,position_rejections,draft_position_rejections,target_position_rejections,combined_position_rejections,edge_oom_rejections,cloud_oom_rejections,both_oom_rejections,other_infeasible_rejections
+7b,llama2_7b_paper.json,4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005,2048,1188,155,0.13047138047138046,990,990,0,0,34,9,0,0
+7b,llama2_7b_paper.json,4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005,4096,1188,0,0.0,1188,0,198,990,0,0,0,0
+7b,llama2_7b_paper.json,4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005,8192,1188,0,0.0,1188,0,198,990,0,0,0,0
+13b,llama2_13b_paper.json,da48cca77bfc395ba6476dfff7ee3916fe96b118c7eef7910a84f80151deb532,2048,1476,141,0.09552845528455285,1230,1230,0,0,70,21,14,0
+13b,llama2_13b_paper.json,da48cca77bfc395ba6476dfff7ee3916fe96b118c7eef7910a84f80151deb532,4096,1476,0,0.0,1476,0,246,1230,0,0,0,0
+13b,llama2_13b_paper.json,da48cca77bfc395ba6476dfff7ee3916fe96b118c7eef7910a84f80151deb532,8192,1476,0,0.0,1476,0,246,1230,0,0,0,0

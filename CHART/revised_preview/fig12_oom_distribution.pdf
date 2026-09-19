@@ -1,0 +1,11 @@
+                  1400                Context-boundary rejection composition                                 Cloud OOM
+                  1200                                                                                       Both OOM
+                  1000                                                                       Position limit
+                   800                                                                       Edge OOM
+                   600
+Rejected actions   400
+                   200
+                                      13B   13B   7B    7B                                                   7B
+                     0 13B            4096  8192  2048  4096                                                 8192
+                                2048
+

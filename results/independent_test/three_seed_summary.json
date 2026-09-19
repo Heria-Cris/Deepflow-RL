@@ -1,0 +1,662 @@
+{
+  "aggregate_by_policy": {
+    "best_feasible_legacy_activation_split": {
+      "mean_feasible_rate": {
+        "mean": 1.0,
+        "sample_std": 0.0
+      },
+      "mean_oracle_ratio": {
+        "mean": 0.5317060326123157,
+        "sample_std": 0.0
+      },
+      "mean_throughput_tok_s": {
+        "mean": 15.952918564848819,
+        "sample_std": 0.0
+      },
+      "seed_count": 3
+    },
+    "global_static_deepflow": {
+      "mean_feasible_rate": {
+        "mean": 1.0,
+        "sample_std": 0.0
+      },
+      "mean_oracle_ratio": {
+        "mean": 0.9325208808480102,
+        "sample_std": 0.0
+      },
+      "mean_throughput_tok_s": {
+        "mean": 31.37382612699601,
+        "sample_std": 0.0
+      },
+      "seed_count": 3
+    },
+    "heuristic_deepflow": {
+      "mean_feasible_rate": {
+        "mean": 1.0,
+        "sample_std": 0.0
+      },
+      "mean_oracle_ratio": {
+        "mean": 0.9721821165204168,
+        "sample_std": 0.0
+      },
+      "mean_throughput_tok_s": {
+        "mean": 31.48419662647033,
+        "sample_std": 0.0
+      },
+      "seed_count": 3
+    },
+    "per_scenario_oracle": {
+      "mean_feasible_rate": {
+        "mean": 1.0,
+        "sample_std": 0.0
+      },
+      "mean_oracle_ratio": {
+        "mean": 1.0,
+        "sample_std": 0.0
+      },
+      "mean_throughput_tok_s": {
+        "mean": 33.25852089147397,
+        "sample_std": 0.0
+      },
+      "seed_count": 3
+    },
+    "ppo_deepflow": {
+      "mean_feasible_rate": {
+        "mean": 1.0,
+        "sample_std": 0.0
+      },
+      "mean_oracle_ratio": {
+        "mean": 0.9822618419637968,
+        "sample_std": 0.007526306388106101
+      },
+      "mean_throughput_tok_s": {
+        "mean": 31.95272681445654,
+        "sample_std": 0.5429084789358872
+      },
+      "seed_count": 3
+    },
+    "remote_target_without_speculation": {
+      "mean_feasible_rate": {
+        "mean": 1.0,
+        "sample_std": 0.0
+      },
+      "mean_oracle_ratio": {
+        "mean": 0.5694666985593416,
+        "sample_std": 0.0
+      },
+      "mean_throughput_tok_s": {
+        "mean": 19.265642576092933,
+        "sample_std": 0.0
+      },
+      "seed_count": 3
+    },
+    "strict_local_target": {
+      "mean_feasible_rate": {
+        "mean": 1.0,
+        "sample_std": 0.0
+      },
+      "mean_oracle_ratio": {
+        "mean": 0.08956776768676564,
+        "sample_std": 0.0
+      },
+      "mean_throughput_tok_s": {
+        "mean": 3.0831051038165027,
+        "sample_std": 0.0
+      },
+      "seed_count": 3
+    },
+    "token_speculation_without_pipeline": {
+      "mean_feasible_rate": {
+        "mean": 0.75,
+        "sample_std": 0.0
+      },
+      "mean_oracle_ratio": {
+        "mean": 0.4031941832872403,
+        "sample_std": 0.0
+      },
+      "mean_throughput_tok_s": {
+        "mean": 16.318414708594386,
+        "sample_std": 0.0
+      },
+      "seed_count": 3
+    }
+  },
+  "metadata": {
+    "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+    "input_paths": [
+      "results/independent_test/seed_42/independent_test_seed_42.json",
+      "results/independent_test/seed_20260912/independent_test_seed_20260912.json",
+      "results/independent_test/seed_20261127/independent_test_seed_20261127.json"
+    ],
+    "policy_names": [
+      "best_feasible_legacy_activation_split",
+      "global_static_deepflow",
+      "heuristic_deepflow",
+      "per_scenario_oracle",
+      "ppo_deepflow",
+      "remote_target_without_speculation",
+      "strict_local_target",
+      "token_speculation_without_pipeline"
+    ],
+    "scenario_count": 32,
+    "seeds": [
+      42,
+      20260912,
+      20261127
+    ],
+    "standard_deviation": "sample"
+  },
+  "per_seed": [
+    {
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "policies": {
+        "best_feasible_legacy_activation_split": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.5317060326123157,
+            "sample_std": 0.14676301866624647
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 15.952918564848819,
+            "sample_std": 12.596605130657009
+          }
+        },
+        "global_static_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.9325208808480102,
+            "sample_std": 0.027523148721697716
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 31.37382612699601,
+            "sample_std": 24.749768733581977
+          }
+        },
+        "heuristic_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.9721821165204168,
+            "sample_std": 0.03771444394290137
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 31.48419662647033,
+            "sample_std": 23.043811092304
+          }
+        },
+        "per_scenario_oracle": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 33.25852089147397,
+            "sample_std": 25.733861099814245
+          }
+        },
+        "ppo_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.9908905373505883,
+            "sample_std": 0.0231341978920967
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 32.57920569751276,
+            "sample_std": 24.62545999476432
+          }
+        },
+        "remote_target_without_speculation": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.5694666985593416,
+            "sample_std": 0.01875505704948971
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 19.265642576092933,
+            "sample_std": 15.360716325098114
+          }
+        },
+        "strict_local_target": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.08956776768676564,
+            "sample_std": 0.0062304427847899215
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 3.0831051038165027,
+            "sample_std": 2.543237696803415
+          }
+        },
+        "token_speculation_without_pipeline": {
+          "feasible_rate": {
+            "mean": 0.75,
+            "sample_std": 0.43994134506405985
+          },
+          "oracle_ratio": {
+            "mean": 0.4031941832872403,
+            "sample_std": 0.23756299355447336
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 16.318414708594386,
+            "sample_std": 16.13128739620748
+          }
+        }
+      },
+      "ppo_model": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_42/best_model/best_model.zip",
+        "sha256": "984c3d06aa8e6e8f64b4f32bc5155a6a9247c5c8ecc3a01f4882398893de61da"
+      },
+      "scenario_ids": [
+        "independent_test_1",
+        "independent_test_10",
+        "independent_test_11",
+        "independent_test_12",
+        "independent_test_13",
+        "independent_test_14",
+        "independent_test_15",
+        "independent_test_16",
+        "independent_test_17",
+        "independent_test_18",
+        "independent_test_19",
+        "independent_test_2",
+        "independent_test_20",
+        "independent_test_21",
+        "independent_test_22",
+        "independent_test_23",
+        "independent_test_24",
+        "independent_test_25",
+        "independent_test_26",
+        "independent_test_27",
+        "independent_test_28",
+        "independent_test_29",
+        "independent_test_3",
+        "independent_test_30",
+        "independent_test_31",
+        "independent_test_32",
+        "independent_test_4",
+        "independent_test_5",
+        "independent_test_6",
+        "independent_test_7",
+        "independent_test_8",
+        "independent_test_9"
+      ],
+      "seed": 42,
+      "vec_normalize": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_42/best_model/vec_normalize.pkl",
+        "sha256": "f6737b850ca18dc8d59179a3e063dac77e71be0718595c01de277950d08b8c8c"
+      }
+    },
+    {
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "policies": {
+        "best_feasible_legacy_activation_split": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.5317060326123157,
+            "sample_std": 0.14676301866624647
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 15.952918564848819,
+            "sample_std": 12.596605130657009
+          }
+        },
+        "global_static_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.9325208808480102,
+            "sample_std": 0.027523148721697716
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 31.37382612699601,
+            "sample_std": 24.749768733581977
+          }
+        },
+        "heuristic_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.9721821165204168,
+            "sample_std": 0.03771444394290137
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 31.48419662647033,
+            "sample_std": 23.043811092304
+          }
+        },
+        "per_scenario_oracle": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 33.25852089147397,
+            "sample_std": 25.733861099814245
+          }
+        },
+        "ppo_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.977050555148097,
+            "sample_std": 0.03693392978272185
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 31.619668863550864,
+            "sample_std": 23.011701804510352
+          }
+        },
+        "remote_target_without_speculation": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.5694666985593416,
+            "sample_std": 0.01875505704948971
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 19.265642576092933,
+            "sample_std": 15.360716325098114
+          }
+        },
+        "strict_local_target": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.08956776768676564,
+            "sample_std": 0.0062304427847899215
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 3.0831051038165027,
+            "sample_std": 2.543237696803415
+          }
+        },
+        "token_speculation_without_pipeline": {
+          "feasible_rate": {
+            "mean": 0.75,
+            "sample_std": 0.43994134506405985
+          },
+          "oracle_ratio": {
+            "mean": 0.4031941832872403,
+            "sample_std": 0.23756299355447336
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 16.318414708594386,
+            "sample_std": 16.13128739620748
+          }
+        }
+      },
+      "ppo_model": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_20260912/best_model/best_model.zip",
+        "sha256": "6368a3b7605731b932725ba4faff85d1e04319fc935b962e4a406e6d9d578c88"
+      },
+      "scenario_ids": [
+        "independent_test_1",
+        "independent_test_10",
+        "independent_test_11",
+        "independent_test_12",
+        "independent_test_13",
+        "independent_test_14",
+        "independent_test_15",
+        "independent_test_16",
+        "independent_test_17",
+        "independent_test_18",
+        "independent_test_19",
+        "independent_test_2",
+        "independent_test_20",
+        "independent_test_21",
+        "independent_test_22",
+        "independent_test_23",
+        "independent_test_24",
+        "independent_test_25",
+        "independent_test_26",
+        "independent_test_27",
+        "independent_test_28",
+        "independent_test_29",
+        "independent_test_3",
+        "independent_test_30",
+        "independent_test_31",
+        "independent_test_32",
+        "independent_test_4",
+        "independent_test_5",
+        "independent_test_6",
+        "independent_test_7",
+        "independent_test_8",
+        "independent_test_9"
+      ],
+      "seed": 20260912,
+      "vec_normalize": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_20260912/best_model/vec_normalize.pkl",
+        "sha256": "5b8cccb1663fbe1febfdab56123d5f97fcde47e6d37b2ecd0b72343d51859c95"
+      }
+    },
+    {
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "policies": {
+        "best_feasible_legacy_activation_split": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.5317060326123157,
+            "sample_std": 0.14676301866624647
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 15.952918564848819,
+            "sample_std": 12.596605130657009
+          }
+        },
+        "global_static_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.9325208808480102,
+            "sample_std": 0.027523148721697716
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 31.37382612699601,
+            "sample_std": 24.749768733581977
+          }
+        },
+        "heuristic_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.9721821165204168,
+            "sample_std": 0.03771444394290137
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 31.48419662647033,
+            "sample_std": 23.043811092304
+          }
+        },
+        "per_scenario_oracle": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 33.25852089147397,
+            "sample_std": 25.733861099814245
+          }
+        },
+        "ppo_deepflow": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.9788444333927052,
+            "sample_std": 0.037318020421238274
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 31.65930588230599,
+            "sample_std": 22.99678754295204
+          }
+        },
+        "remote_target_without_speculation": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.5694666985593416,
+            "sample_std": 0.01875505704948971
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 19.265642576092933,
+            "sample_std": 15.360716325098114
+          }
+        },
+        "strict_local_target": {
+          "feasible_rate": {
+            "mean": 1.0,
+            "sample_std": 0.0
+          },
+          "oracle_ratio": {
+            "mean": 0.08956776768676564,
+            "sample_std": 0.0062304427847899215
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 3.0831051038165027,
+            "sample_std": 2.543237696803415
+          }
+        },
+        "token_speculation_without_pipeline": {
+          "feasible_rate": {
+            "mean": 0.75,
+            "sample_std": 0.43994134506405985
+          },
+          "oracle_ratio": {
+            "mean": 0.4031941832872403,
+            "sample_std": 0.23756299355447336
+          },
+          "scenario_count": 32,
+          "throughput_tok_s": {
+            "mean": 16.318414708594386,
+            "sample_std": 16.13128739620748
+          }
+        }
+      },
+      "ppo_model": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_20261127/best_model/best_model.zip",
+        "sha256": "1c002abf66b21ee812c1b847f81efae84d2abc3c2991572cd5c6571523a37462"
+      },
+      "scenario_ids": [
+        "independent_test_1",
+        "independent_test_10",
+        "independent_test_11",
+        "independent_test_12",
+        "independent_test_13",
+        "independent_test_14",
+        "independent_test_15",
+        "independent_test_16",
+        "independent_test_17",
+        "independent_test_18",
+        "independent_test_19",
+        "independent_test_2",
+        "independent_test_20",
+        "independent_test_21",
+        "independent_test_22",
+        "independent_test_23",
+        "independent_test_24",
+        "independent_test_25",
+        "independent_test_26",
+        "independent_test_27",
+        "independent_test_28",
+        "independent_test_29",
+        "independent_test_3",
+        "independent_test_30",
+        "independent_test_31",
+        "independent_test_32",
+        "independent_test_4",
+        "independent_test_5",
+        "independent_test_6",
+        "independent_test_7",
+        "independent_test_8",
+        "independent_test_9"
+      ],
+      "seed": 20261127,
+      "vec_normalize": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_20261127/best_model/vec_normalize.pkl",
+        "sha256": "e45397644cc1ea3df094bf65e84a15cd7bfaecf09366b36ef338e48da8bbe85b"
+      }
+    }
+  ],
+  "schema_version": "1.0"
+}

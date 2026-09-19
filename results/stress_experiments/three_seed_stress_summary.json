@@ -1,0 +1,1440 @@
+{
+  "aggregate_by_profile_policy": {
+    "base": {
+      "best_feasible_legacy_activation_split": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 14.840244379534601,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.4163973743107761,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 14.840244379534601,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 3.372798531237945,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "global_static_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 38.5108757892433,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.8916445658737316,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 38.5108757892433,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.5736093579568045,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "heuristic_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 45.22374323738077,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.9791157467947729,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 45.22374323738077,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.403514439182265,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "per_profile_oracle": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 45.94262866446775,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 45.94262866446775,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.3519993297751793,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "ppo_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 45.16896924091451,
+          "sample_std": 0.43013686419420555
+        },
+        "oracle_ratio": {
+          "mean": 0.9856030256370428,
+          "sample_std": 0.0069949778841496115
+        },
+        "p5_throughput_tok_s": {
+          "mean": 45.16896924091451,
+          "sample_std": 0.43013686419420555
+        },
+        "p95_makespan_s": {
+          "mean": 2.392490898984553,
+          "sample_std": 0.02431062471602919
+        },
+        "seed_count": 3
+      },
+      "remote_target_without_speculation": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 29.705257166962447,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.6019812865236458,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 29.705257166962447,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.2256860978671975,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "strict_local_target": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 5.32568698933434,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.10099803398604823,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 5.32568698933434,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 14.067800898124704,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "token_speculation_without_pipeline": {
+        "feasible_rate": {
+          "mean": 0.75,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 27.49270833349112,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.44776072137702266,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 27.49270833349112,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 250000002.27239197,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      }
+    },
+    "mild": {
+      "best_feasible_legacy_activation_split": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 14.052563263201376,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.42974011351360947,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 13.797067088180823,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 3.5999906252275897,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "global_static_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 35.64687840399992,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.8995964977194071,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 34.12644314653544,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.864060536672675,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "heuristic_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 41.40994482561372,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.9831981679923371,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 40.749290820613254,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.6866868207509613,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "per_profile_oracle": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 41.7880161105141,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 41.077878850226845,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.643594481164308,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "ppo_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 41.25399517408246,
+          "sample_std": 0.5277362617575313
+        },
+        "oracle_ratio": {
+          "mean": 0.9880725856119209,
+          "sample_std": 0.0075127605449823885
+        },
+        "p5_throughput_tok_s": {
+          "mean": 40.60978121207153,
+          "sample_std": 0.46751206833887676
+        },
+        "p95_makespan_s": {
+          "mean": 2.6805517966804566,
+          "sample_std": 0.027951134367108384
+        },
+        "seed_count": 3
+      },
+      "remote_target_without_speculation": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 27.177246491127665,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.6050467444297336,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 26.92489966643282,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.449719871364218,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "strict_local_target": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 4.841533626667582,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.10108157740867503,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 4.841533626667582,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 15.474580987937165,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "token_speculation_without_pipeline": {
+        "feasible_rate": {
+          "mean": 0.75,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 25.09457857286417,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.44943487317522957,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 24.961658556993516,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 250000002.5005556,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      }
+    },
+    "severe": {
+      "best_feasible_legacy_activation_split": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 12.91238364568463,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.44503137609940063,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 11.856190352405903,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 4.1640213317016785,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "global_static_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 31.57245026199048,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.9049554957748389,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 29.394424041409216,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 3.285419435615752,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "heuristic_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 36.414772514231075,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.9844717617060628,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 33.97372031577824,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 3.0846941060695117,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "per_profile_oracle": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 36.72018107945055,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 34.19044144924826,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 3.030018949298986,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "ppo_deepflow": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 36.18860205341726,
+          "sample_std": 0.587642184245823
+        },
+        "oracle_ratio": {
+          "mean": 0.9880018283573929,
+          "sample_std": 0.00816873526521648
+        },
+        "p5_throughput_tok_s": {
+          "mean": 33.99184352522254,
+          "sample_std": 0.21205776006319146
+        },
+        "p95_makespan_s": {
+          "mean": 3.0715832648965464,
+          "sample_std": 0.029140450589561426
+        },
+        "seed_count": 3
+      },
+      "remote_target_without_speculation": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 24.01283209078396,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.608497651856699,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 23.131047070162612,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 2.8007193926773635,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "strict_local_target": {
+        "feasible_rate": {
+          "mean": 1.0,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 4.260549591467473,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.10130409283548265,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 4.260549591467473,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 17.584751122655877,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      },
+      "token_speculation_without_pipeline": {
+        "feasible_rate": {
+          "mean": 0.5,
+          "sample_std": 0.0
+        },
+        "mean_throughput_tok_s": {
+          "mean": 19.999066748704877,
+          "sample_std": 0.0
+        },
+        "oracle_ratio": {
+          "mean": 0.31734479770950486,
+          "sample_std": 0.0
+        },
+        "p5_throughput_tok_s": {
+          "mean": 19.530813013604178,
+          "sample_std": 0.0
+        },
+        "p95_makespan_s": {
+          "mean": 500000001.11744195,
+          "sample_std": 0.0
+        },
+        "seed_count": 3
+      }
+    }
+  },
+  "metadata": {
+    "common_random_seed": 20260919,
+    "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+    "input_paths": [
+      "results/stress_experiments/seed_42/stress_experiments_seed_42_summary.json",
+      "results/stress_experiments/seed_20260912/stress_experiments_seed_20260912_summary.json",
+      "results/stress_experiments/seed_20261127/stress_experiments_seed_20261127_summary.json"
+    ],
+    "policy_names": [
+      "best_feasible_legacy_activation_split",
+      "global_static_deepflow",
+      "heuristic_deepflow",
+      "per_profile_oracle",
+      "ppo_deepflow",
+      "remote_target_without_speculation",
+      "strict_local_target",
+      "token_speculation_without_pipeline"
+    ],
+    "pressure_profiles": [
+      "base",
+      "mild",
+      "severe"
+    ],
+    "scenario_count": 48,
+    "seeds": [
+      42,
+      20260912,
+      20261127
+    ],
+    "standard_deviation": "sample_across_seed_means",
+    "trial_count": 100
+  },
+  "per_seed": [
+    {
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "policy_names": [
+        "best_feasible_legacy_activation_split",
+        "global_static_deepflow",
+        "heuristic_deepflow",
+        "per_profile_oracle",
+        "ppo_deepflow",
+        "remote_target_without_speculation",
+        "strict_local_target",
+        "token_speculation_without_pipeline"
+      ],
+      "ppo_model": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_42/best_model/best_model.zip",
+        "sha256": "984c3d06aa8e6e8f64b4f32bc5155a6a9247c5c8ecc3a01f4882398893de61da"
+      },
+      "pressure_profiles": [
+        "base",
+        "mild",
+        "severe"
+      ],
+      "profile_policy": {
+        "base": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 14.840244379534601,
+            "oracle_ratio": 0.4163973743107761,
+            "p5_throughput_tok_s": 14.840244379534601,
+            "p95_makespan_s": 3.372798531237945,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 38.5108757892433,
+            "oracle_ratio": 0.8916445658737316,
+            "p5_throughput_tok_s": 38.5108757892433,
+            "p95_makespan_s": 2.5736093579568045,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 45.22374323738077,
+            "oracle_ratio": 0.9791157467947729,
+            "p5_throughput_tok_s": 45.22374323738077,
+            "p95_makespan_s": 2.403514439182265,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 45.94262866446775,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 45.94262866446775,
+            "p95_makespan_s": 2.3519993297751793,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 44.75209056575811,
+            "oracle_ratio": 0.9829388779440101,
+            "p5_throughput_tok_s": 44.75209056575811,
+            "p95_makespan_s": 2.4167347553076017,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 29.705257166962447,
+            "oracle_ratio": 0.6019812865236458,
+            "p5_throughput_tok_s": 29.705257166962447,
+            "p95_makespan_s": 2.2256860978671975,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 5.32568698933434,
+            "oracle_ratio": 0.10099803398604823,
+            "p5_throughput_tok_s": 5.32568698933434,
+            "p95_makespan_s": 14.067800898124704,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.75,
+            "mean_throughput_tok_s": 27.49270833349112,
+            "oracle_ratio": 0.44776072137702266,
+            "p5_throughput_tok_s": 27.49270833349112,
+            "p95_makespan_s": 250000002.27239197,
+            "scenario_count": 48
+          }
+        },
+        "mild": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 14.052563263201376,
+            "oracle_ratio": 0.42974011351360947,
+            "p5_throughput_tok_s": 13.797067088180823,
+            "p95_makespan_s": 3.5999906252275897,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 35.64687840399992,
+            "oracle_ratio": 0.8995964977194071,
+            "p5_throughput_tok_s": 34.12644314653544,
+            "p95_makespan_s": 2.864060536672675,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 41.40994482561372,
+            "oracle_ratio": 0.9831981679923371,
+            "p5_throughput_tok_s": 40.749290820613254,
+            "p95_makespan_s": 2.6866868207509613,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 41.7880161105141,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 41.077878850226845,
+            "p95_makespan_s": 2.643594481164308,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 40.690484038048005,
+            "oracle_ratio": 0.9832581132455236,
+            "p5_throughput_tok_s": 40.0881072752483,
+            "p95_makespan_s": 2.711238861090556,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 27.177246491127665,
+            "oracle_ratio": 0.6050467444297336,
+            "p5_throughput_tok_s": 26.92489966643282,
+            "p95_makespan_s": 2.449719871364218,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 4.841533626667582,
+            "oracle_ratio": 0.10108157740867503,
+            "p5_throughput_tok_s": 4.841533626667582,
+            "p95_makespan_s": 15.474580987937165,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.75,
+            "mean_throughput_tok_s": 25.09457857286417,
+            "oracle_ratio": 0.44943487317522957,
+            "p5_throughput_tok_s": 24.961658556993516,
+            "p95_makespan_s": 250000002.5005556,
+            "scenario_count": 48
+          }
+        },
+        "severe": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 12.91238364568463,
+            "oracle_ratio": 0.44503137609940063,
+            "p5_throughput_tok_s": 11.856190352405903,
+            "p95_makespan_s": 4.1640213317016785,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 31.57245026199048,
+            "oracle_ratio": 0.9049554957748389,
+            "p5_throughput_tok_s": 29.394424041409216,
+            "p95_makespan_s": 3.285419435615752,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 36.414772514231075,
+            "oracle_ratio": 0.9844717617060628,
+            "p5_throughput_tok_s": 33.97372031577824,
+            "p95_makespan_s": 3.0846941060695117,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 36.72018107945055,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 34.19044144924826,
+            "p95_makespan_s": 3.030018949298986,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 35.53741806682993,
+            "oracle_ratio": 0.981437684984032,
+            "p5_throughput_tok_s": 33.819410648801146,
+            "p95_makespan_s": 3.101409711051977,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 24.01283209078396,
+            "oracle_ratio": 0.608497651856699,
+            "p5_throughput_tok_s": 23.131047070162612,
+            "p95_makespan_s": 2.8007193926773635,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 4.260549591467473,
+            "oracle_ratio": 0.10130409283548265,
+            "p5_throughput_tok_s": 4.260549591467473,
+            "p95_makespan_s": 17.584751122655877,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.5,
+            "mean_throughput_tok_s": 19.999066748704877,
+            "oracle_ratio": 0.31734479770950486,
+            "p5_throughput_tok_s": 19.530813013604178,
+            "p95_makespan_s": 500000001.11744195,
+            "scenario_count": 48
+          }
+        }
+      },
+      "random_seed": 20260919,
+      "scenario_ids": [
+        "stress_bw0.5_lat120_p1024",
+        "stress_bw0.5_lat120_p128",
+        "stress_bw0.5_lat120_p1536",
+        "stress_bw0.5_lat120_p512",
+        "stress_bw0.5_lat50_p1024",
+        "stress_bw0.5_lat50_p128",
+        "stress_bw0.5_lat50_p1536",
+        "stress_bw0.5_lat50_p512",
+        "stress_bw0.5_lat80_p1024",
+        "stress_bw0.5_lat80_p128",
+        "stress_bw0.5_lat80_p1536",
+        "stress_bw0.5_lat80_p512",
+        "stress_bw10_lat120_p1024",
+        "stress_bw10_lat120_p128",
+        "stress_bw10_lat120_p1536",
+        "stress_bw10_lat120_p512",
+        "stress_bw10_lat50_p1024",
+        "stress_bw10_lat50_p128",
+        "stress_bw10_lat50_p1536",
+        "stress_bw10_lat50_p512",
+        "stress_bw10_lat80_p1024",
+        "stress_bw10_lat80_p128",
+        "stress_bw10_lat80_p1536",
+        "stress_bw10_lat80_p512",
+        "stress_bw1_lat120_p1024",
+        "stress_bw1_lat120_p128",
+        "stress_bw1_lat120_p1536",
+        "stress_bw1_lat120_p512",
+        "stress_bw1_lat50_p1024",
+        "stress_bw1_lat50_p128",
+        "stress_bw1_lat50_p1536",
+        "stress_bw1_lat50_p512",
+        "stress_bw1_lat80_p1024",
+        "stress_bw1_lat80_p128",
+        "stress_bw1_lat80_p1536",
+        "stress_bw1_lat80_p512",
+        "stress_bw5_lat120_p1024",
+        "stress_bw5_lat120_p128",
+        "stress_bw5_lat120_p1536",
+        "stress_bw5_lat120_p512",
+        "stress_bw5_lat50_p1024",
+        "stress_bw5_lat50_p128",
+        "stress_bw5_lat50_p1536",
+        "stress_bw5_lat50_p512",
+        "stress_bw5_lat80_p1024",
+        "stress_bw5_lat80_p128",
+        "stress_bw5_lat80_p1536",
+        "stress_bw5_lat80_p512"
+      ],
+      "seed": 42,
+      "trial_count": 100,
+      "vec_normalize": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_42/best_model/vec_normalize.pkl",
+        "sha256": "f6737b850ca18dc8d59179a3e063dac77e71be0718595c01de277950d08b8c8c"
+      }
+    },
+    {
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "policy_names": [
+        "best_feasible_legacy_activation_split",
+        "global_static_deepflow",
+        "heuristic_deepflow",
+        "per_profile_oracle",
+        "ppo_deepflow",
+        "remote_target_without_speculation",
+        "strict_local_target",
+        "token_speculation_without_pipeline"
+      ],
+      "ppo_model": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_20260912/best_model/best_model.zip",
+        "sha256": "6368a3b7605731b932725ba4faff85d1e04319fc935b962e4a406e6d9d578c88"
+      },
+      "pressure_profiles": [
+        "base",
+        "mild",
+        "severe"
+      ],
+      "profile_policy": {
+        "base": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 14.840244379534601,
+            "oracle_ratio": 0.4163973743107761,
+            "p5_throughput_tok_s": 14.840244379534601,
+            "p95_makespan_s": 3.372798531237945,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 38.5108757892433,
+            "oracle_ratio": 0.8916445658737316,
+            "p5_throughput_tok_s": 38.5108757892433,
+            "p95_makespan_s": 2.5736093579568045,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 45.22374323738077,
+            "oracle_ratio": 0.9791157467947729,
+            "p5_throughput_tok_s": 45.22374323738077,
+            "p95_makespan_s": 2.403514439182265,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 45.94262866446775,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 45.94262866446775,
+            "p95_makespan_s": 2.3519993297751793,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 45.14357776446531,
+            "oracle_ratio": 0.9803315812241747,
+            "p5_throughput_tok_s": 45.14357776446531,
+            "p95_makespan_s": 2.392623890121993,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 29.705257166962447,
+            "oracle_ratio": 0.6019812865236458,
+            "p5_throughput_tok_s": 29.705257166962447,
+            "p95_makespan_s": 2.2256860978671975,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 5.32568698933434,
+            "oracle_ratio": 0.10099803398604823,
+            "p5_throughput_tok_s": 5.32568698933434,
+            "p95_makespan_s": 14.067800898124704,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.75,
+            "mean_throughput_tok_s": 27.49270833349112,
+            "oracle_ratio": 0.44776072137702266,
+            "p5_throughput_tok_s": 27.49270833349112,
+            "p95_makespan_s": 250000002.27239197,
+            "scenario_count": 48
+          }
+        },
+        "mild": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 14.052563263201376,
+            "oracle_ratio": 0.42974011351360947,
+            "p5_throughput_tok_s": 13.797067088180823,
+            "p95_makespan_s": 3.5999906252275897,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 35.64687840399992,
+            "oracle_ratio": 0.8995964977194071,
+            "p5_throughput_tok_s": 34.12644314653544,
+            "p95_makespan_s": 2.864060536672675,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 41.40994482561372,
+            "oracle_ratio": 0.9831981679923371,
+            "p5_throughput_tok_s": 40.749290820613254,
+            "p95_makespan_s": 2.6866868207509613,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 41.7880161105141,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 41.077878850226845,
+            "p95_makespan_s": 2.643594481164308,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 41.33488521084138,
+            "oracle_ratio": 0.9842302447789414,
+            "p5_throughput_tok_s": 40.7503694309179,
+            "p95_makespan_s": 2.67386817041173,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 27.177246491127665,
+            "oracle_ratio": 0.6050467444297336,
+            "p5_throughput_tok_s": 26.92489966643282,
+            "p95_makespan_s": 2.449719871364218,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 4.841533626667582,
+            "oracle_ratio": 0.10108157740867503,
+            "p5_throughput_tok_s": 4.841533626667582,
+            "p95_makespan_s": 15.474580987937165,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.75,
+            "mean_throughput_tok_s": 25.09457857286417,
+            "oracle_ratio": 0.44943487317522957,
+            "p5_throughput_tok_s": 24.961658556993516,
+            "p95_makespan_s": 250000002.5005556,
+            "scenario_count": 48
+          }
+        },
+        "severe": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 12.91238364568463,
+            "oracle_ratio": 0.44503137609940063,
+            "p5_throughput_tok_s": 11.856190352405903,
+            "p95_makespan_s": 4.1640213317016785,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 31.57245026199048,
+            "oracle_ratio": 0.9049554957748389,
+            "p5_throughput_tok_s": 29.394424041409216,
+            "p95_makespan_s": 3.285419435615752,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 36.414772514231075,
+            "oracle_ratio": 0.9844717617060628,
+            "p5_throughput_tok_s": 33.97372031577824,
+            "p95_makespan_s": 3.0846941060695117,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 36.72018107945055,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 34.19044144924826,
+            "p95_makespan_s": 3.030018949298986,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 36.34898842206586,
+            "oracle_ratio": 0.9854177043293308,
+            "p5_throughput_tok_s": 33.9274987767024,
+            "p95_makespan_s": 3.0701590444826894,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 24.01283209078396,
+            "oracle_ratio": 0.608497651856699,
+            "p5_throughput_tok_s": 23.131047070162612,
+            "p95_makespan_s": 2.8007193926773635,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 4.260549591467473,
+            "oracle_ratio": 0.10130409283548265,
+            "p5_throughput_tok_s": 4.260549591467473,
+            "p95_makespan_s": 17.584751122655877,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.5,
+            "mean_throughput_tok_s": 19.999066748704877,
+            "oracle_ratio": 0.31734479770950486,
+            "p5_throughput_tok_s": 19.530813013604178,
+            "p95_makespan_s": 500000001.11744195,
+            "scenario_count": 48
+          }
+        }
+      },
+      "random_seed": 20260919,
+      "scenario_ids": [
+        "stress_bw0.5_lat120_p1024",
+        "stress_bw0.5_lat120_p128",
+        "stress_bw0.5_lat120_p1536",
+        "stress_bw0.5_lat120_p512",
+        "stress_bw0.5_lat50_p1024",
+        "stress_bw0.5_lat50_p128",
+        "stress_bw0.5_lat50_p1536",
+        "stress_bw0.5_lat50_p512",
+        "stress_bw0.5_lat80_p1024",
+        "stress_bw0.5_lat80_p128",
+        "stress_bw0.5_lat80_p1536",
+        "stress_bw0.5_lat80_p512",
+        "stress_bw10_lat120_p1024",
+        "stress_bw10_lat120_p128",
+        "stress_bw10_lat120_p1536",
+        "stress_bw10_lat120_p512",
+        "stress_bw10_lat50_p1024",
+        "stress_bw10_lat50_p128",
+        "stress_bw10_lat50_p1536",
+        "stress_bw10_lat50_p512",
+        "stress_bw10_lat80_p1024",
+        "stress_bw10_lat80_p128",
+        "stress_bw10_lat80_p1536",
+        "stress_bw10_lat80_p512",
+        "stress_bw1_lat120_p1024",
+        "stress_bw1_lat120_p128",
+        "stress_bw1_lat120_p1536",
+        "stress_bw1_lat120_p512",
+        "stress_bw1_lat50_p1024",
+        "stress_bw1_lat50_p128",
+        "stress_bw1_lat50_p1536",
+        "stress_bw1_lat50_p512",
+        "stress_bw1_lat80_p1024",
+        "stress_bw1_lat80_p128",
+        "stress_bw1_lat80_p1536",
+        "stress_bw1_lat80_p512",
+        "stress_bw5_lat120_p1024",
+        "stress_bw5_lat120_p128",
+        "stress_bw5_lat120_p1536",
+        "stress_bw5_lat120_p512",
+        "stress_bw5_lat50_p1024",
+        "stress_bw5_lat50_p128",
+        "stress_bw5_lat50_p1536",
+        "stress_bw5_lat50_p512",
+        "stress_bw5_lat80_p1024",
+        "stress_bw5_lat80_p128",
+        "stress_bw5_lat80_p1536",
+        "stress_bw5_lat80_p512"
+      ],
+      "seed": 20260912,
+      "trial_count": 100,
+      "vec_normalize": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_20260912/best_model/vec_normalize.pkl",
+        "sha256": "5b8cccb1663fbe1febfdab56123d5f97fcde47e6d37b2ecd0b72343d51859c95"
+      }
+    },
+    {
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "policy_names": [
+        "best_feasible_legacy_activation_split",
+        "global_static_deepflow",
+        "heuristic_deepflow",
+        "per_profile_oracle",
+        "ppo_deepflow",
+        "remote_target_without_speculation",
+        "strict_local_target",
+        "token_speculation_without_pipeline"
+      ],
+      "ppo_model": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_20261127/best_model/best_model.zip",
+        "sha256": "1c002abf66b21ee812c1b847f81efae84d2abc3c2991572cd5c6571523a37462"
+      },
+      "pressure_profiles": [
+        "base",
+        "mild",
+        "severe"
+      ],
+      "profile_policy": {
+        "base": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 14.840244379534601,
+            "oracle_ratio": 0.4163973743107761,
+            "p5_throughput_tok_s": 14.840244379534601,
+            "p95_makespan_s": 3.372798531237945,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 38.5108757892433,
+            "oracle_ratio": 0.8916445658737316,
+            "p5_throughput_tok_s": 38.5108757892433,
+            "p95_makespan_s": 2.5736093579568045,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 45.22374323738077,
+            "oracle_ratio": 0.9791157467947729,
+            "p5_throughput_tok_s": 45.22374323738077,
+            "p95_makespan_s": 2.403514439182265,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 45.94262866446775,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 45.94262866446775,
+            "p95_makespan_s": 2.3519993297751793,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 45.61123939252009,
+            "oracle_ratio": 0.9935386177429436,
+            "p5_throughput_tok_s": 45.61123939252009,
+            "p95_makespan_s": 2.368114051524064,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 29.705257166962447,
+            "oracle_ratio": 0.6019812865236458,
+            "p5_throughput_tok_s": 29.705257166962447,
+            "p95_makespan_s": 2.2256860978671975,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 5.32568698933434,
+            "oracle_ratio": 0.10099803398604823,
+            "p5_throughput_tok_s": 5.32568698933434,
+            "p95_makespan_s": 14.067800898124704,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.75,
+            "mean_throughput_tok_s": 27.49270833349112,
+            "oracle_ratio": 0.44776072137702266,
+            "p5_throughput_tok_s": 27.49270833349112,
+            "p95_makespan_s": 250000002.27239197,
+            "scenario_count": 48
+          }
+        },
+        "mild": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 14.052563263201376,
+            "oracle_ratio": 0.42974011351360947,
+            "p5_throughput_tok_s": 13.797067088180823,
+            "p95_makespan_s": 3.5999906252275897,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 35.64687840399992,
+            "oracle_ratio": 0.8995964977194071,
+            "p5_throughput_tok_s": 34.12644314653544,
+            "p95_makespan_s": 2.864060536672675,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 41.40994482561372,
+            "oracle_ratio": 0.9831981679923371,
+            "p5_throughput_tok_s": 40.749290820613254,
+            "p95_makespan_s": 2.6866868207509613,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 41.7880161105141,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 41.077878850226845,
+            "p95_makespan_s": 2.643594481164308,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 41.736616273357996,
+            "oracle_ratio": 0.9967293988112976,
+            "p5_throughput_tok_s": 40.9908669300484,
+            "p95_makespan_s": 2.656548358539084,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 27.177246491127665,
+            "oracle_ratio": 0.6050467444297336,
+            "p5_throughput_tok_s": 26.92489966643282,
+            "p95_makespan_s": 2.449719871364218,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 4.841533626667582,
+            "oracle_ratio": 0.10108157740867503,
+            "p5_throughput_tok_s": 4.841533626667582,
+            "p95_makespan_s": 15.474580987937165,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.75,
+            "mean_throughput_tok_s": 25.09457857286417,
+            "oracle_ratio": 0.44943487317522957,
+            "p5_throughput_tok_s": 24.961658556993516,
+            "p95_makespan_s": 250000002.5005556,
+            "scenario_count": 48
+          }
+        },
+        "severe": {
+          "best_feasible_legacy_activation_split": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 12.91238364568463,
+            "oracle_ratio": 0.44503137609940063,
+            "p5_throughput_tok_s": 11.856190352405903,
+            "p95_makespan_s": 4.1640213317016785,
+            "scenario_count": 48
+          },
+          "global_static_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 31.57245026199048,
+            "oracle_ratio": 0.9049554957748389,
+            "p5_throughput_tok_s": 29.394424041409216,
+            "p95_makespan_s": 3.285419435615752,
+            "scenario_count": 48
+          },
+          "heuristic_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 36.414772514231075,
+            "oracle_ratio": 0.9844717617060628,
+            "p5_throughput_tok_s": 33.97372031577824,
+            "p95_makespan_s": 3.0846941060695117,
+            "scenario_count": 48
+          },
+          "per_profile_oracle": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 36.72018107945055,
+            "oracle_ratio": 1.0,
+            "p5_throughput_tok_s": 34.19044144924826,
+            "p95_makespan_s": 3.030018949298986,
+            "scenario_count": 48
+          },
+          "ppo_deepflow": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 36.67939967135601,
+            "oracle_ratio": 0.9971500957588159,
+            "p5_throughput_tok_s": 34.22862115016409,
+            "p95_makespan_s": 3.043181039154973,
+            "scenario_count": 48
+          },
+          "remote_target_without_speculation": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 24.01283209078396,
+            "oracle_ratio": 0.608497651856699,
+            "p5_throughput_tok_s": 23.131047070162612,
+            "p95_makespan_s": 2.8007193926773635,
+            "scenario_count": 48
+          },
+          "strict_local_target": {
+            "feasible_rate": 1.0,
+            "mean_throughput_tok_s": 4.260549591467473,
+            "oracle_ratio": 0.10130409283548265,
+            "p5_throughput_tok_s": 4.260549591467473,
+            "p95_makespan_s": 17.584751122655877,
+            "scenario_count": 48
+          },
+          "token_speculation_without_pipeline": {
+            "feasible_rate": 0.5,
+            "mean_throughput_tok_s": 19.999066748704877,
+            "oracle_ratio": 0.31734479770950486,
+            "p5_throughput_tok_s": 19.530813013604178,
+            "p95_makespan_s": 500000001.11744195,
+            "scenario_count": 48
+          }
+        }
+      },
+      "random_seed": 20260919,
+      "scenario_ids": [
+        "stress_bw0.5_lat120_p1024",
+        "stress_bw0.5_lat120_p128",
+        "stress_bw0.5_lat120_p1536",
+        "stress_bw0.5_lat120_p512",
+        "stress_bw0.5_lat50_p1024",
+        "stress_bw0.5_lat50_p128",
+        "stress_bw0.5_lat50_p1536",
+        "stress_bw0.5_lat50_p512",
+        "stress_bw0.5_lat80_p1024",
+        "stress_bw0.5_lat80_p128",
+        "stress_bw0.5_lat80_p1536",
+        "stress_bw0.5_lat80_p512",
+        "stress_bw10_lat120_p1024",
+        "stress_bw10_lat120_p128",
+        "stress_bw10_lat120_p1536",
+        "stress_bw10_lat120_p512",
+        "stress_bw10_lat50_p1024",
+        "stress_bw10_lat50_p128",
+        "stress_bw10_lat50_p1536",
+        "stress_bw10_lat50_p512",
+        "stress_bw10_lat80_p1024",
+        "stress_bw10_lat80_p128",
+        "stress_bw10_lat80_p1536",
+        "stress_bw10_lat80_p512",
+        "stress_bw1_lat120_p1024",
+        "stress_bw1_lat120_p128",
+        "stress_bw1_lat120_p1536",
+        "stress_bw1_lat120_p512",
+        "stress_bw1_lat50_p1024",
+        "stress_bw1_lat50_p128",
+        "stress_bw1_lat50_p1536",
+        "stress_bw1_lat50_p512",
+        "stress_bw1_lat80_p1024",
+        "stress_bw1_lat80_p128",
+        "stress_bw1_lat80_p1536",
+        "stress_bw1_lat80_p512",
+        "stress_bw5_lat120_p1024",
+        "stress_bw5_lat120_p128",
+        "stress_bw5_lat120_p1536",
+        "stress_bw5_lat120_p512",
+        "stress_bw5_lat50_p1024",
+        "stress_bw5_lat50_p128",
+        "stress_bw5_lat50_p1536",
+        "stress_bw5_lat50_p512",
+        "stress_bw5_lat80_p1024",
+        "stress_bw5_lat80_p128",
+        "stress_bw5_lat80_p1536",
+        "stress_bw5_lat80_p512"
+      ],
+      "seed": 20261127,
+      "trial_count": 100,
+      "vec_normalize": {
+        "exists": true,
+        "path": "models/ppo_deepflow/seeds/seed_20261127/best_model/vec_normalize.pkl",
+        "sha256": "e45397644cc1ea3df094bf65e84a15cd7bfaecf09366b36ef338e48da8bbe85b"
+      }
+    }
+  ],
+  "schema_version": "1.0"
+}

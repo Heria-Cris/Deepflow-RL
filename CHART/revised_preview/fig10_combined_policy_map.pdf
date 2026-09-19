@@ -1,0 +1,16 @@
+                             Robustness under common-random network and resource stress
+
+                                       Legacy Split                                      PPO
+                                       Global Static                                     Profile Oracle
+                                       Frozen Heuristic
+
+                         40
+
+Mean throughput (tok/s)  30
+
+                         20
+
+                         10
+
+                         0 Base  Mild  Severe
+

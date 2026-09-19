@@ -1,0 +1,12 @@
+                                       Protocol sensitivity to draft acceptance and target scale
+
+                                       Legacy Split           Global Static  Frozen Heuristic  Per-scenario Oracle
+
+                         35            LLaMA-style 7B target                                   LLaMA-style 13B target
+                         30
+Mean throughput (tok/s)  25                     default
+                         20               Acceptance profile
+                         15                                   favorable conservative                default            favorable
+                         10                                                                    Acceptance profile
+                         conservative
+

@@ -1,0 +1,118 @@
+{
+  "metadata": {
+    "prompts": [
+      2048,
+      4096,
+      8192
+    ],
+    "scenario": {
+      "bandwidth_mbps": 1.0,
+      "link_delay_ms": 50.0
+    },
+    "scope": "position limits, memory feasibility, and action-domain counts only"
+  },
+  "rows": [
+    {
+      "both_oom_rejections": 0,
+      "cloud_oom_rejections": 9,
+      "combined_position_rejections": 0,
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "draft_position_rejections": 990,
+      "edge_oom_rejections": 34,
+      "feasible_actions": 155,
+      "feasible_rate": 0.13047138047138046,
+      "other_infeasible_rejections": 0,
+      "position_rejections": 990,
+      "prompt_len": 2048,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b",
+      "target_position_rejections": 0,
+      "total_actions": 1188
+    },
+    {
+      "both_oom_rejections": 0,
+      "cloud_oom_rejections": 0,
+      "combined_position_rejections": 990,
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "draft_position_rejections": 0,
+      "edge_oom_rejections": 0,
+      "feasible_actions": 0,
+      "feasible_rate": 0.0,
+      "other_infeasible_rejections": 0,
+      "position_rejections": 1188,
+      "prompt_len": 4096,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b",
+      "target_position_rejections": 198,
+      "total_actions": 1188
+    },
+    {
+      "both_oom_rejections": 0,
+      "cloud_oom_rejections": 0,
+      "combined_position_rejections": 990,
+      "config_hash": "4f1a972f1703550a1886a011b58c29a7546847f5b375a9a3a541c2ceb9d91005",
+      "draft_position_rejections": 0,
+      "edge_oom_rejections": 0,
+      "feasible_actions": 0,
+      "feasible_rate": 0.0,
+      "other_infeasible_rejections": 0,
+      "position_rejections": 1188,
+      "prompt_len": 8192,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b",
+      "target_position_rejections": 198,
+      "total_actions": 1188
+    },
+    {
+      "both_oom_rejections": 14,
+      "cloud_oom_rejections": 21,
+      "combined_position_rejections": 0,
+      "config_hash": "da48cca77bfc395ba6476dfff7ee3916fe96b118c7eef7910a84f80151deb532",
+      "draft_position_rejections": 1230,
+      "edge_oom_rejections": 70,
+      "feasible_actions": 141,
+      "feasible_rate": 0.09552845528455285,
+      "other_infeasible_rejections": 0,
+      "position_rejections": 1230,
+      "prompt_len": 2048,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b",
+      "target_position_rejections": 0,
+      "total_actions": 1476
+    },
+    {
+      "both_oom_rejections": 0,
+      "cloud_oom_rejections": 0,
+      "combined_position_rejections": 1230,
+      "config_hash": "da48cca77bfc395ba6476dfff7ee3916fe96b118c7eef7910a84f80151deb532",
+      "draft_position_rejections": 0,
+      "edge_oom_rejections": 0,
+      "feasible_actions": 0,
+      "feasible_rate": 0.0,
+      "other_infeasible_rejections": 0,
+      "position_rejections": 1476,
+      "prompt_len": 4096,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b",
+      "target_position_rejections": 246,
+      "total_actions": 1476
+    },
+    {
+      "both_oom_rejections": 0,
+      "cloud_oom_rejections": 0,
+      "combined_position_rejections": 1230,
+      "config_hash": "da48cca77bfc395ba6476dfff7ee3916fe96b118c7eef7910a84f80151deb532",
+      "draft_position_rejections": 0,
+      "edge_oom_rejections": 0,
+      "feasible_actions": 0,
+      "feasible_rate": 0.0,
+      "other_infeasible_rejections": 0,
+      "position_rejections": 1476,
+      "prompt_len": 8192,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b",
+      "target_position_rejections": 246,
+      "total_actions": 1476
+    }
+  ]
+}

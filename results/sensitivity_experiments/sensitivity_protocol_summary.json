@@ -1,0 +1,593 @@
+{
+  "metadata": {
+    "acceptance_profiles": [
+      {
+        "alpha_base": 0.65,
+        "decay_factor": 0.75,
+        "formula": "0.65 * 0.75^(j-1)",
+        "name": "conservative"
+      },
+      {
+        "alpha_base": 0.85,
+        "decay_factor": 0.85,
+        "formula": "0.85 * 0.85^(j-1)",
+        "name": "default"
+      },
+      {
+        "alpha_base": 0.9,
+        "decay_factor": 0.9,
+        "formula": "0.9 * 0.9^(j-1)",
+        "name": "favorable"
+      }
+    ],
+    "calibration_scenario_count": 140,
+    "policies": [
+      "remote_target_without_speculation",
+      "best_feasible_legacy_activation_split",
+      "token_speculation_without_pipeline",
+      "global_static_deepflow",
+      "heuristic_deepflow",
+      "per_scenario_oracle"
+    ],
+    "protocol_scenarios": [
+      {
+        "bandwidth_mbps": 0.75,
+        "link_delay_ms": 20.0,
+        "prompt_len": 256,
+        "scenario_id": "test_bw0.75_lat20_p256"
+      },
+      {
+        "bandwidth_mbps": 0.75,
+        "link_delay_ms": 20.0,
+        "prompt_len": 768,
+        "scenario_id": "test_bw0.75_lat20_p768"
+      },
+      {
+        "bandwidth_mbps": 0.75,
+        "link_delay_ms": 20.0,
+        "prompt_len": 1280,
+        "scenario_id": "test_bw0.75_lat20_p1280"
+      },
+      {
+        "bandwidth_mbps": 0.75,
+        "link_delay_ms": 20.0,
+        "prompt_len": 1536,
+        "scenario_id": "test_bw0.75_lat20_p1536"
+      },
+      {
+        "bandwidth_mbps": 0.75,
+        "link_delay_ms": 80.0,
+        "prompt_len": 256,
+        "scenario_id": "test_bw0.75_lat80_p256"
+      },
+      {
+        "bandwidth_mbps": 0.75,
+        "link_delay_ms": 80.0,
+        "prompt_len": 768,
+        "scenario_id": "test_bw0.75_lat80_p768"
+      },
+      {
+        "bandwidth_mbps": 0.75,
+        "link_delay_ms": 80.0,
+        "prompt_len": 1280,
+        "scenario_id": "test_bw0.75_lat80_p1280"
+      },
+      {
+        "bandwidth_mbps": 0.75,
+        "link_delay_ms": 80.0,
+        "prompt_len": 1536,
+        "scenario_id": "test_bw0.75_lat80_p1536"
+      },
+      {
+        "bandwidth_mbps": 3.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 256,
+        "scenario_id": "test_bw3_lat20_p256"
+      },
+      {
+        "bandwidth_mbps": 3.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 768,
+        "scenario_id": "test_bw3_lat20_p768"
+      },
+      {
+        "bandwidth_mbps": 3.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 1280,
+        "scenario_id": "test_bw3_lat20_p1280"
+      },
+      {
+        "bandwidth_mbps": 3.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 1536,
+        "scenario_id": "test_bw3_lat20_p1536"
+      },
+      {
+        "bandwidth_mbps": 3.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 256,
+        "scenario_id": "test_bw3_lat80_p256"
+      },
+      {
+        "bandwidth_mbps": 3.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 768,
+        "scenario_id": "test_bw3_lat80_p768"
+      },
+      {
+        "bandwidth_mbps": 3.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 1280,
+        "scenario_id": "test_bw3_lat80_p1280"
+      },
+      {
+        "bandwidth_mbps": 3.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 1536,
+        "scenario_id": "test_bw3_lat80_p1536"
+      },
+      {
+        "bandwidth_mbps": 20.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 256,
+        "scenario_id": "test_bw20_lat20_p256"
+      },
+      {
+        "bandwidth_mbps": 20.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 768,
+        "scenario_id": "test_bw20_lat20_p768"
+      },
+      {
+        "bandwidth_mbps": 20.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 1280,
+        "scenario_id": "test_bw20_lat20_p1280"
+      },
+      {
+        "bandwidth_mbps": 20.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 1536,
+        "scenario_id": "test_bw20_lat20_p1536"
+      },
+      {
+        "bandwidth_mbps": 20.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 256,
+        "scenario_id": "test_bw20_lat80_p256"
+      },
+      {
+        "bandwidth_mbps": 20.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 768,
+        "scenario_id": "test_bw20_lat80_p768"
+      },
+      {
+        "bandwidth_mbps": 20.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 1280,
+        "scenario_id": "test_bw20_lat80_p1280"
+      },
+      {
+        "bandwidth_mbps": 20.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 1536,
+        "scenario_id": "test_bw20_lat80_p1536"
+      },
+      {
+        "bandwidth_mbps": 75.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 256,
+        "scenario_id": "test_bw75_lat20_p256"
+      },
+      {
+        "bandwidth_mbps": 75.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 768,
+        "scenario_id": "test_bw75_lat20_p768"
+      },
+      {
+        "bandwidth_mbps": 75.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 1280,
+        "scenario_id": "test_bw75_lat20_p1280"
+      },
+      {
+        "bandwidth_mbps": 75.0,
+        "link_delay_ms": 20.0,
+        "prompt_len": 1536,
+        "scenario_id": "test_bw75_lat20_p1536"
+      },
+      {
+        "bandwidth_mbps": 75.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 256,
+        "scenario_id": "test_bw75_lat80_p256"
+      },
+      {
+        "bandwidth_mbps": 75.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 768,
+        "scenario_id": "test_bw75_lat80_p768"
+      },
+      {
+        "bandwidth_mbps": 75.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 1280,
+        "scenario_id": "test_bw75_lat80_p1280"
+      },
+      {
+        "bandwidth_mbps": 75.0,
+        "link_delay_ms": 80.0,
+        "prompt_len": 1536,
+        "scenario_id": "test_bw75_lat80_p1536"
+      }
+    ],
+    "target_models": {
+      "13b": "llama2_13b_paper.json",
+      "7b": "llama2_7b_paper.json"
+    }
+  },
+  "summaries": [
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.6384929650513831,
+      "mean_throughput_tok_s": 19.265642576092933,
+      "policy_name": "remote_target_without_speculation",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.5961552486865358,
+      "mean_throughput_tok_s": 15.952918564848819,
+      "policy_name": "best_feasible_legacy_activation_split",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 0.75,
+      "mean_oracle_ratio": 0.40319418328724027,
+      "mean_throughput_tok_s": 14.554261767124721,
+      "policy_name": "token_speculation_without_pipeline",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9325208808480102,
+      "mean_throughput_tok_s": 27.982061140293737,
+      "policy_name": "global_static_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9721821165204168,
+      "mean_throughput_tok_s": 28.080499693878938,
+      "policy_name": "heuristic_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 1.0,
+      "mean_throughput_tok_s": 29.663005119422728,
+      "policy_name": "per_scenario_oracle",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.5694666985593416,
+      "mean_throughput_tok_s": 19.265642576092933,
+      "policy_name": "remote_target_without_speculation",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.5317060326123157,
+      "mean_throughput_tok_s": 15.952918564848819,
+      "policy_name": "best_feasible_legacy_activation_split",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 0.75,
+      "mean_oracle_ratio": 0.4031941832872403,
+      "mean_throughput_tok_s": 16.318414708594386,
+      "policy_name": "token_speculation_without_pipeline",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9325208808480102,
+      "mean_throughput_tok_s": 31.37382612699601,
+      "policy_name": "global_static_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9721821165204168,
+      "mean_throughput_tok_s": 31.48419662647033,
+      "policy_name": "heuristic_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 1.0,
+      "mean_throughput_tok_s": 33.25852089147397,
+      "policy_name": "per_scenario_oracle",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.5544807328077801,
+      "mean_throughput_tok_s": 19.265642576092933,
+      "policy_name": "remote_target_without_speculation",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.5177137685962022,
+      "mean_throughput_tok_s": 15.952918564848819,
+      "policy_name": "best_feasible_legacy_activation_split",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 0.75,
+      "mean_oracle_ratio": 0.40319418328724027,
+      "mean_throughput_tok_s": 16.7594529439618,
+      "policy_name": "token_speculation_without_pipeline",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9325208808480102,
+      "mean_throughput_tok_s": 32.221767373671575,
+      "policy_name": "global_static_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9721821165204168,
+      "mean_throughput_tok_s": 32.33512085961817,
+      "policy_name": "heuristic_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 1.0,
+      "mean_throughput_tok_s": 34.15739983448678,
+      "policy_name": "per_scenario_oracle",
+      "scenario_count": 32,
+      "target_model_config": "llama2_7b_paper.json",
+      "target_model_key": "7b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.6050109528624253,
+      "mean_throughput_tok_s": 10.116426692174803,
+      "policy_name": "remote_target_without_speculation",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.6101191171604908,
+      "mean_throughput_tok_s": 9.315808986820766,
+      "policy_name": "best_feasible_legacy_activation_split",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 0.25,
+      "mean_oracle_ratio": 0.16864859711942798,
+      "mean_throughput_tok_s": 6.488679435739954,
+      "policy_name": "token_speculation_without_pipeline",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9373013109922207,
+      "mean_throughput_tok_s": 15.65769141606881,
+      "policy_name": "global_static_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.957834295725129,
+      "mean_throughput_tok_s": 15.642160412813306,
+      "policy_name": "heuristic_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "conservative",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 1.0,
+      "mean_throughput_tok_s": 16.574937998819955,
+      "policy_name": "per_scenario_oracle",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.49397769566597693,
+      "mean_throughput_tok_s": 10.116426692174803,
+      "policy_name": "remote_target_without_speculation",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.4986822651362009,
+      "mean_throughput_tok_s": 9.315808986820766,
+      "policy_name": "best_feasible_legacy_activation_split",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 0.25,
+      "mean_oracle_ratio": 0.1544176392218006,
+      "mean_throughput_tok_s": 7.2751860340114645,
+      "policy_name": "token_speculation_without_pipeline",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9464443204895747,
+      "mean_throughput_tok_s": 19.258179036281867,
+      "policy_name": "global_static_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.876912074675896,
+      "mean_throughput_tok_s": 17.538179856790677,
+      "policy_name": "heuristic_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "default",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 1.0,
+      "mean_throughput_tok_s": 20.271966904090696,
+      "policy_name": "per_scenario_oracle",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.4577265700644355,
+      "mean_throughput_tok_s": 10.116426692174803,
+      "policy_name": "remote_target_without_speculation",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.4620858892525868,
+      "mean_throughput_tok_s": 9.315808986820766,
+      "policy_name": "best_feasible_legacy_activation_split",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 0.25,
+      "mean_oracle_ratio": 0.14695269809919972,
+      "mean_throughput_tok_s": 7.4718126835793415,
+      "policy_name": "token_speculation_without_pipeline",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.9464443204895747,
+      "mean_throughput_tok_s": 20.78339236834373,
+      "policy_name": "global_static_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 0.8345199163697408,
+      "mean_throughput_tok_s": 18.01218471778502,
+      "policy_name": "heuristic_deepflow",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    },
+    {
+      "acceptance_profile": "favorable",
+      "feasible_rate": 1.0,
+      "mean_oracle_ratio": 1.0,
+      "mean_throughput_tok_s": 21.87747042189398,
+      "policy_name": "per_scenario_oracle",
+      "scenario_count": 32,
+      "target_model_config": "llama2_13b_paper.json",
+      "target_model_key": "13b"
+    }
+  ]
+}
