@@ -25,6 +25,8 @@ RECORD_FIELDS = (
     "link_delay_ms",
     "prompt_len",
     "pressure_profile",
+    "acceptance_profile",
+    "target_model_config",
     "random_seed",
     "trial_index",
     "policy_name",
@@ -103,12 +105,14 @@ def build_run_metadata(
     random_seed: Optional[int] = None,
     ppo_model_path: Optional[str] = None,
     vec_normalize_path: Optional[str] = None,
+    config_filenames: Optional[Sequence[str]] = None,
 ) -> Dict[str, Any]:
     """Fingerprint simulator inputs and optional PPO artifacts for one suite."""
     config_root = Path(config_dir)
     config_files = []
-    for filename in CONFIG_FILENAMES:
-        path = config_root / filename
+    for filename in config_filenames or CONFIG_FILENAMES:
+        candidate = Path(filename)
+        path = candidate if candidate.is_absolute() else config_root / candidate
         config_files.append({
             "path": path.as_posix(),
             "sha256": _sha256_file(path),
@@ -153,6 +157,8 @@ class ResultRecorder:
         info: Mapping[str, Any],
         environment: Any,
         pressure_profile: Optional[str] = None,
+        acceptance_profile: Optional[str] = None,
+        target_model_config: Optional[str] = None,
         random_seed: Optional[int] = None,
         trial_index: Optional[int] = None,
     ) -> None:
@@ -173,6 +179,12 @@ class ResultRecorder:
             "link_delay_ms": float(link_delay_ms),
             "prompt_len": int(prompt_len),
             "pressure_profile": pressure_profile or self.metadata["pressure_profile"],
+            "acceptance_profile": acceptance_profile or str(
+                self.metadata.get("acceptance_profile", "default")
+            ),
+            "target_model_config": target_model_config or str(
+                self.metadata.get("target_model_config", "")
+            ),
             "random_seed": self.metadata["random_seed"] if random_seed is None else random_seed,
             "trial_index": trial_index,
             "policy_name": policy_name,

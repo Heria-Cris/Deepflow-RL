@@ -1,0 +1,10 @@
+{
+  "model_name": "LLaMA-style-13B-analytical",
+  "num_layers": 40,
+  "hidden_size": 5120,
+  "intermediate_size": 13824,
+  "num_heads": 40,
+  "vocab_size": 32000,
+  "max_position_embeddings": 4096,
+  "bytes_per_param": 2
+}

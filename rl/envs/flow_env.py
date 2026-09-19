@@ -24,6 +24,7 @@ class DeepFlowEnv(gym.Env):
         domain_randomization: bool = True,
         seed: Optional[int] = None,
         reward_mode: str = "shaped",
+        target_model_config_filename: str = "llama2_7b_paper.json",
     ):
         super().__init__()
 
@@ -32,6 +33,7 @@ class DeepFlowEnv(gym.Env):
         self.episode_len = episode_len
         self.domain_randomization = domain_randomization
         self.reward_mode = reward_mode
+        self.target_model_config_filename = target_model_config_filename
 
         self.rng = np.random.default_rng(seed)
 
@@ -70,7 +72,9 @@ class DeepFlowEnv(gym.Env):
         self.cloud = Device(**dev_cfg[1])
         self.network = NetworkLink(**net_cfg)
 
-        self.target_model = LLaMAModel(os.path.join(self.config_dir, "llama2_7b_paper.json"))
+        self.target_model = LLaMAModel(
+            os.path.join(self.config_dir, self.target_model_config_filename)
+        )
         self.draft_model = LLaMAModel(os.path.join(self.config_dir, "llama_1b_paper.json"))
 
         self.memory_budget_ratio = float(sim_cfg.get("memory_budget_ratio", 0.78))

@@ -65,7 +65,11 @@ def set_scenario(environment: Any, bandwidth_mbps: float, link_delay_ms: float, 
     environment.set_scenario(bandwidth_mbps, link_delay_ms, prompt_len)
 
 
-def search_per_scenario_oracle(environment: Any) -> Tuple[Optional[List[int]], Optional[Dict[str, Any]]]:
+def search_per_scenario_oracle(
+    environment: Any,
+    *,
+    acceptance_fn=None,
+) -> Tuple[Optional[List[int]], Optional[Dict[str, Any]]]:
     """Find the feasible full-action optimum for the current scenario only."""
     best_action: Optional[List[int]] = None
     best_info: Optional[Dict[str, Any]] = None
@@ -73,7 +77,7 @@ def search_per_scenario_oracle(environment: Any) -> Tuple[Optional[List[int]], O
 
     for flat_index in range(environment.num_discrete_actions):
         action = environment.unflatten_action(flat_index)
-        info = environment.evaluate_action(action)
+        info = environment.evaluate_action(action, acceptance_fn=acceptance_fn)
         if info["valid"] and info["feasible"] and info["throughput"] > best_throughput:
             best_action = action
             best_info = info
@@ -95,6 +99,8 @@ def token_deepflow_candidate_actions(environment: Any) -> List[List[int]]:
 def select_global_static_deepflow(
     environment: Any,
     calibration_scenarios: Sequence[Scenario] = GLOBAL_STATIC_CALIBRATION_SCENARIOS,
+    *,
+    acceptance_fn=None,
 ) -> GlobalStaticSelection:
     """Choose one Token-ID action on calibration data without using a test scenario."""
     candidates = token_deepflow_candidate_actions(environment)
@@ -104,12 +110,12 @@ def select_global_static_deepflow(
     scores = {environment.flatten_action(action): 0.0 for action in candidates}
     for _, bandwidth, link_delay, prompt_len in calibration_scenarios:
         set_scenario(environment, bandwidth, link_delay, prompt_len)
-        _, oracle_info = search_per_scenario_oracle(environment)
+        _, oracle_info = search_per_scenario_oracle(environment, acceptance_fn=acceptance_fn)
         oracle_throughput = 0.0 if oracle_info is None else float(oracle_info["throughput"])
 
         for action in candidates:
             flat_index = environment.flatten_action(action)
-            info = environment.evaluate_action(action)
+            info = environment.evaluate_action(action, acceptance_fn=acceptance_fn)
             candidate_throughput = float(info["throughput"]) if info["valid"] and info["feasible"] else 0.0
             ratio = candidate_throughput / oracle_throughput if oracle_throughput > 0.0 else 0.0
             scores[flat_index] += ratio
