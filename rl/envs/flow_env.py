@@ -1,7 +1,7 @@
 # rl/envs/flow_env.py
 import json
 import os
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Sequence
 
 import gymnasium as gym
 import numpy as np
@@ -10,6 +10,7 @@ from gymnasium import spaces
 from core.hardware import Device, NetworkLink
 from core.model_spec import LLaMAModel
 from engine.simulator import DeepFlowSimulator
+from engine.stress import NetworkTransmissionSample, StressProfile
 
 
 class DeepFlowEnv(gym.Env):
@@ -188,7 +189,43 @@ class DeepFlowEnv(gym.Env):
     # ------------------------------------------------------------------
     # Unified evaluation
     # ------------------------------------------------------------------
-    def evaluate_action(self, action):
+    def _simulation_info(self, result, micro_batch_size: int, k_steps: int, partition_point: int, mode: str):
+        return {
+            "valid": True,
+            "feasible": result.feasible,
+            "micro_batch_size": micro_batch_size,
+            "k_steps": k_steps,
+            "partition_point": partition_point,
+            "throughput": result.throughput,
+            "makespan": result.makespan,
+            "data_size_mb": result.data_size_mb,
+            "bottleneck": result.bottleneck_stage,
+            "effective_tokens_per_seq": result.effective_tokens_per_seq,
+            "total_effective_tokens": result.total_effective_tokens,
+            "util_edge": result.util_edge,
+            "util_cloud": result.util_cloud,
+            "bubble_rate": result.bubble_rate,
+            "timeline": result.timeline,
+            "stage_costs": result.stage_costs,
+            "verify_seq_len": result.verify_seq_len,
+            "edge_peak_memory_mb": result.edge_peak_memory_mb,
+            "cloud_peak_memory_mb": result.cloud_peak_memory_mb,
+            "edge_budget_mb": result.edge_budget_mb,
+            "cloud_budget_mb": result.cloud_budget_mb,
+            "oom_device": result.oom_device,
+            "infeasibility_reason": result.infeasibility_reason,
+            "mode": mode,
+            "memory_breakdown": result.memory_breakdown,
+        }
+
+    def evaluate_action(
+        self,
+        action,
+        *,
+        stress_profile: Optional[StressProfile] = None,
+        network_samples: Optional[List[NetworkTransmissionSample]] = None,
+        acceptance_fn=None,
+    ):
         mb_idx, k_idx, partition_point = [int(x) for x in action]
 
         micro_batch_size = self.mb_options[mb_idx]
@@ -225,35 +262,44 @@ class DeepFlowEnv(gym.Env):
             k_steps=k_steps,
             partition_point=partition_point,
             prompt_len=self.current_prompt_len,
+            acceptance_fn=acceptance_fn,
+            stress_profile=stress_profile,
+            network_samples=network_samples,
         )
 
-        return {
-            "valid": True,
-            "feasible": result.feasible,
-            "micro_batch_size": micro_batch_size,
-            "k_steps": k_steps,
-            "partition_point": partition_point,
-            "throughput": result.throughput,
-            "makespan": result.makespan,
-            "data_size_mb": result.data_size_mb,
-            "bottleneck": result.bottleneck_stage,
-            "effective_tokens_per_seq": result.effective_tokens_per_seq,
-            "total_effective_tokens": result.total_effective_tokens,
-            "util_edge": result.util_edge,
-            "util_cloud": result.util_cloud,
-            "bubble_rate": result.bubble_rate,
-            "timeline": result.timeline,
-            "stage_costs": result.stage_costs,
-            "verify_seq_len": result.verify_seq_len,
-            "edge_peak_memory_mb": result.edge_peak_memory_mb,
-            "cloud_peak_memory_mb": result.cloud_peak_memory_mb,
-            "edge_budget_mb": result.edge_budget_mb,
-            "cloud_budget_mb": result.cloud_budget_mb,
-            "oom_device": result.oom_device,
-            "infeasibility_reason": result.infeasibility_reason,
-            "mode": mode,
-            "memory_breakdown": result.memory_breakdown,
-        }
+        return self._simulation_info(result, micro_batch_size, k_steps, partition_point, mode)
+
+    def evaluate_action_trials(
+        self,
+        action,
+        *,
+        stress_profile: StressProfile,
+        network_trials: Sequence[Sequence[NetworkTransmissionSample]],
+        acceptance_fn=None,
+    ) -> List[Dict[str, Any]]:
+        """Evaluate common random network trials through the same simulator backend."""
+        mb_idx, k_idx, partition_point = [int(value) for value in action]
+        micro_batch_size = self.mb_options[mb_idx]
+        k_steps = self.k_options[k_idx]
+        mode = self.simulator.describe_execution_mode(k_steps, partition_point)
+        if self.total_batch_size % micro_batch_size != 0:
+            invalid = self.evaluate_action(action, stress_profile=stress_profile, acceptance_fn=acceptance_fn)
+            return [invalid.copy() for _ in network_trials]
+
+        results = self.simulator.simulate_stress_trials(
+            total_batch_size=self.total_batch_size,
+            micro_batch_size=micro_batch_size,
+            k_steps=k_steps,
+            partition_point=partition_point,
+            prompt_len=self.current_prompt_len,
+            stress_profile=stress_profile,
+            network_trials=network_trials,
+            acceptance_fn=acceptance_fn,
+        )
+        return [
+            self._simulation_info(result, micro_batch_size, k_steps, partition_point, mode)
+            for result in results
+        ]
 
     # ------------------------------------------------------------------
     # Reward

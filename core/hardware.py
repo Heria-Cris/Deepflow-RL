@@ -93,7 +93,16 @@ class NetworkLink:
         raw_gb_s = (self.bandwidth_mbps / 8.0) / 1024.0
         self.bandwidth_gb_s = raw_gb_s * self.bandwidth_efficiency
 
-    def estimate_comm_time(self, data_size_mb: float) -> float:
+    def estimate_comm_time(
+        self,
+        data_size_mb: float,
+        *,
+        protocol_overhead_s: float = None,
+        jitter_s: float = 0.0,
+        retry_jitter_s: float = 0.0,
+        packet_lost: bool = False,
+    ) -> float:
+        """Estimate one transmission plus an optional single generic retry."""
         if data_size_mb <= 0:
             return 0.0
 
@@ -102,4 +111,12 @@ class NetworkLink:
         else:
             transmission_time = (data_size_mb / 1024.0) / self.bandwidth_gb_s
 
-        return self.latency_s + self.serialization_overhead_s + transmission_time
+        overhead_s = self.serialization_overhead_s if protocol_overhead_s is None else float(protocol_overhead_s)
+        if overhead_s < 0.0:
+            raise ValueError("protocol_overhead_s must be non-negative")
+
+        base_attempt_s = self.latency_s + overhead_s + transmission_time
+        total_s = base_attempt_s + max(0.0, float(jitter_s))
+        if packet_lost:
+            total_s += base_attempt_s + max(0.0, float(retry_jitter_s))
+        return total_s

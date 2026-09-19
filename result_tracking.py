@@ -26,6 +26,7 @@ RECORD_FIELDS = (
     "prompt_len",
     "pressure_profile",
     "random_seed",
+    "trial_index",
     "policy_name",
     "mode",
     "action_mb_idx",
@@ -153,6 +154,7 @@ class ResultRecorder:
         environment: Any,
         pressure_profile: Optional[str] = None,
         random_seed: Optional[int] = None,
+        trial_index: Optional[int] = None,
     ) -> None:
         if len(action) != 3:
             raise ValueError("action must use [mb_idx, k_idx, partition_point] order")
@@ -172,6 +174,7 @@ class ResultRecorder:
             "prompt_len": int(prompt_len),
             "pressure_profile": pressure_profile or self.metadata["pressure_profile"],
             "random_seed": self.metadata["random_seed"] if random_seed is None else random_seed,
+            "trial_index": trial_index,
             "policy_name": policy_name,
             "mode": str(mode),
             "action_mb_idx": mb_idx,
