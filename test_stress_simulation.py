@@ -179,7 +179,13 @@ def assert_batched_trials_match_single_trial_simulation(simulator: DeepFlowSimul
     for single, batch in zip(single_results, batch_results):
         assert math.isclose(batch.makespan, single.makespan, rel_tol=0.0, abs_tol=1e-12)
         assert math.isclose(batch.throughput, single.throughput, rel_tol=0.0, abs_tol=1e-12)
-        assert batch.stage_costs == single.stage_costs
+        for stage_name in ("edge", "comm", "cloud"):
+            assert math.isclose(
+                batch.stage_costs[stage_name],
+                single.stage_costs[stage_name],
+                rel_tol=0.0,
+                abs_tol=1e-12,
+            )
         assert batch.timeline == []
 
 

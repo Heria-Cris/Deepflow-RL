@@ -5,6 +5,8 @@ import dataclasses
 import math
 from typing import Callable, Dict, List, Optional, Sequence
 
+import numpy as np
+
 from core.hardware import Device, NetworkLink
 from core.model_spec import LLaMAModel, TransformerLayerSpec
 from engine.physics import PhysicsEngine
@@ -777,25 +779,63 @@ class DeepFlowSimulator:
             reason = f"memory_{mem.oom_device}_oom"
             return [self._infeasible_result(base_cost, mem, reason) for _ in network_trials]
 
-        results = []
-        for trial in network_trials:
-            stage_costs = [
-                StageCost(
-                    edge_time=base_cost.edge_time,
-                    comm_time=self._estimate_comm_time(base_cost.data_size_mb, stress_profile, sample),
-                    cloud_time=base_cost.cloud_time,
-                    data_size_mb=base_cost.data_size_mb,
-                    effective_tokens_per_seq=base_cost.effective_tokens_per_seq,
-                    verify_seq_len=base_cost.verify_seq_len,
-                )
+        communication_times = np.asarray([
+            [
+                self._estimate_comm_time(base_cost.data_size_mb, stress_profile, sample)
                 for sample in trial
             ]
-            results.append(self._simulate_pipeline(
-                total_batch_size=total_batch_size,
-                k_steps=k_steps,
-                partition_point=partition_point,
-                mem=mem,
-                stage_costs=stage_costs,
-                include_timeline=False,
+            for trial in network_trials
+        ], dtype=float)
+        trial_count = communication_times.shape[0]
+        net_end = np.zeros(trial_count, dtype=float)
+        cloud_end = np.zeros(trial_count, dtype=float)
+        edge_end = 0.0
+        for micro_batch_index in range(num_micro_batches):
+            edge_end += base_cost.edge_time
+            net_end = np.maximum(edge_end, net_end) + communication_times[:, micro_batch_index]
+            cloud_end = np.maximum(net_end, cloud_end) + base_cost.cloud_time
+
+        average_comm = communication_times.mean(axis=1)
+        total_effective_tokens = total_batch_size * base_cost.effective_tokens_per_seq
+        active_edge = num_micro_batches * base_cost.edge_time
+        active_cloud = num_micro_batches * base_cost.cloud_time
+        stage_averages = np.column_stack((
+            np.full(trial_count, base_cost.edge_time),
+            average_comm,
+            np.full(trial_count, base_cost.cloud_time),
+        ))
+        bottlenecks = np.argmax(stage_averages, axis=1)
+
+        results = []
+        for trial_index in range(trial_count):
+            makespan = float(cloud_end[trial_index])
+            throughput = total_effective_tokens / makespan if makespan > 0.0 else 0.0
+            util_edge = active_edge / makespan if makespan > 0.0 else 0.0
+            util_cloud = active_cloud / makespan if makespan > 0.0 else 0.0
+            results.append(SimulationResult(
+                feasible=True,
+                makespan=makespan,
+                throughput=throughput,
+                timeline=[],
+                util_edge=util_edge,
+                util_cloud=util_cloud,
+                bubble_rate=1.0 - (util_edge + util_cloud) / 2.0 if makespan > 0.0 else 1.0,
+                bottleneck_stage=int(bottlenecks[trial_index]),
+                data_size_mb=base_cost.data_size_mb,
+                effective_tokens_per_seq=base_cost.effective_tokens_per_seq,
+                total_effective_tokens=total_effective_tokens,
+                stage_costs={
+                    "edge": base_cost.edge_time,
+                    "comm": float(average_comm[trial_index]),
+                    "cloud": base_cost.cloud_time,
+                },
+                verify_seq_len=base_cost.verify_seq_len,
+                edge_peak_memory_mb=mem.edge_peak_memory_mb,
+                cloud_peak_memory_mb=mem.cloud_peak_memory_mb,
+                edge_budget_mb=mem.edge_budget_mb,
+                cloud_budget_mb=mem.cloud_budget_mb,
+                oom_device=mem.oom_device,
+                infeasibility_reason="none",
+                memory_breakdown=mem.breakdown,
             ))
         return results
